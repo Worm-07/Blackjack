@@ -2,6 +2,41 @@ class Consoleui
 {
     public List<string> players = [];
     public int NumbersOfPlayers;
+
+    public Game.MenuChoice Menu()
+    {
+        while (true)
+        {
+            Console.WriteLine("=== Välkommen till Blackjack! ===");
+            Console.WriteLine("1. Starta ny runda");
+            Console.WriteLine("2. Återuppta runda");
+            Console.WriteLine("3. Visa statestik");
+            Console.WriteLine("4. Avsluta");
+            string? input = Console.ReadLine();
+            if (int.TryParse(input, out int menuchoice))
+            {
+                switch (menuchoice)
+                {
+                    default:
+                        Console.WriteLine(" === VÄLJ ETT NUMMER FRÅN MENYN ===");
+                        break;
+                    case 1:
+                        return Game.MenuChoice.StartNewRound;
+                    case 2:
+                        return Game.MenuChoice.StartExistingRound;
+                    case 3:
+                        return Game.MenuChoice.ShowStatistic;
+                    case 4:
+                        return Game.MenuChoice.Quit;
+                }
+            }
+            else
+            {
+                Console.WriteLine(" === VÄLJ ETT NUMMER FRÅN MENYN ===");
+            }
+
+        }
+    }
     public void Print()
     {
         Console.WriteLine("1 - 5 spelare");
