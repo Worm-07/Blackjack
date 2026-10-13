@@ -1,6 +1,6 @@
 class Consoleui
 {
-    public List<int> players = [];
+    public List<string> players = [];
     public int NumbersOfPlayers;
     public void Print()
     {
@@ -21,6 +21,29 @@ class Consoleui
         else
         {
             Console.WriteLine(" === ANGE ETT NUMMER ===");
+        }
+    }
+
+    public void NamesOfPlayers()
+    {
+        for (int i = 0; i < NumbersOfPlayers; i++)
+        {
+            string? name = "";
+            while (true)
+            {
+                Console.WriteLine("Ange namn på spelaren: ");
+                name = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Console.WriteLine(" === ANGE ETT NAMN ===");
+                }
+                else
+                {
+                    break;
+                }
+            }
+            players.Insert(i, name);
         }
     }
 }
