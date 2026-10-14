@@ -17,15 +17,17 @@ public class Round
     private readonly List<Player> _players;
     private readonly Func<Player, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
+    private readonly Action<Player>? _showBusted;
     private readonly Dealer _dealer = new();
 
     public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
-        Action<Dealer, bool>? showDealer = null)
+        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
         _players = new List<Player>(players);
         _askPlayer = askPlayer;
         _showDealer = showDealer;
+        _showBusted = showBusted;
     }
 
     /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
@@ -57,6 +59,8 @@ public class Round
         {
             while (!player.IsBusted && _askPlayer(player) == Move.Hit)
                 player.AddCard(_deck.Deal());
+            if (player.IsBusted)
+                _showBusted?.Invoke(player); // visa den spräckta handen
         }
     }
 
