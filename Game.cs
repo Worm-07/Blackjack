@@ -64,8 +64,10 @@ public class Game
     /// Decken skapas vid första rundan och blandas om när färre än 15
     /// kort är kvar. Spelarens beslut (köpa/stanna) skickas in som en
     /// funktion – Round pratar aldrig direkt med Console.
+    /// Returnerar rundan så att loopen kan visa avgörandet för varje
+    /// spelare (Settle är ren – samma svar före och efter Play()).
     /// </summary>
-    public void PlayRound(Func<Player, Move> askPlayer)
+    public Round PlayRound(Func<Player, Move> askPlayer)
     {
         // Ny lek vid första rundan; blandas om när korten tar slut
         // (US05: färre än 15 kort kvar → ny blandad lek).
@@ -80,5 +82,6 @@ public class Game
 
         Round round = new(_deck, _seatedPlayers, askPlayer);
         round.Play();
+        return round;
     }
 }

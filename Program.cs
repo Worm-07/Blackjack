@@ -21,7 +21,12 @@ while (true)
     {
         // US08: en runda. US11: spelarens beslut (köpa/stanna) levereras
         // till Round som Func<Player, Move> – Round pratar aldrig med Console.
-        game.PlayRound(ui.ReadMove);
+        Round round = game.PlayRound(ui.ReadMove);
+
+        // US09: visa resultatet för varje spelare (Round visar själv aldrig).
+        foreach (Player p in round.Players)
+            ui.ShowResult(p, round.Settle(p));
+
         new GameStorage().SavePlayers(game.SavedPlayers); // US10
     }
     else
