@@ -16,13 +16,16 @@ public class Round
     private readonly Deck _deck;
     private readonly List<Player> _players;
     private readonly Func<Player, Move> _askPlayer;
+    private readonly Action<Dealer, bool>? _showDealer;
     private readonly Dealer _dealer = new();
 
-    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer)
+    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
+        Action<Dealer, bool>? showDealer = null)
     {
         _deck = deck;
         _players = new List<Player>(players);
         _askPlayer = askPlayer;
+        _showDealer = showDealer;
     }
 
     /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
@@ -64,6 +67,7 @@ public class Round
     {
         while (_dealer.ShouldHit)
             _dealer.AddCard(_deck.Deal());
+        _showDealer?.Invoke(_dealer, true); // hålkortet vänt, visa slutvärde
     }
 
     /// <summary>
@@ -102,6 +106,7 @@ public class Round
     public void Play()
     {
         DealCards();
+        _showDealer?.Invoke(_dealer, false); // öppet kort, hålkortet dolt
         PlayPlayers();
         PlayDealer();
 
