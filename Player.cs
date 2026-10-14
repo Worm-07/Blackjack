@@ -1,6 +1,5 @@
 /*
  ***US10: Player – ärver Participant***
- ***Skelett – implementera TODO:erna.***
  */
 
 /// En spelare som sitter vid bordet. Ärver namn och hand från

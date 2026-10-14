@@ -1,6 +1,5 @@
 /*
  ***US12: Dealer – hålkortet och den fasta regeln***
- ***Skelett – implementera TODO:erna.***
  */
 
 /// Givaren ärver Participant. I stället för ett eget beslut följer
@@ -18,8 +17,7 @@ public class Dealer : Participant
     {
         get
         {
-            // TODO US12: return Hand.Count >= 1 ? Hand.Cards[0] : null;
-            throw new NotImplementedException();
+            return Hand.Count >= 1 ? Hand.Cards[0] : null;
         }
     }
 
@@ -28,8 +26,7 @@ public class Dealer : Participant
     {
         get
         {
-            // TODO US12: return Hand.Count >= 2 ? Hand.Cards[1] : null;
-            throw new NotImplementedException();
+            return Hand.Count >= 2 ? Hand.Cards[1] : null;
         }
     }
 
@@ -39,8 +36,7 @@ public class Dealer : Participant
     {
         get
         {
-            // TODO US12 (kräver US07): return Hand.GetValue() <= 16;
-            throw new NotImplementedException();
+            return Hand.GetValue() <= 16;
         }
     }
 }

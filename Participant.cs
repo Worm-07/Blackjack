@@ -1,6 +1,5 @@
 /*
  ***US10: Participant – gemensam bas för Player och Dealer***
- ***Skelett – implementera TODO:erna.***
  */
 
 /// Gemensam bas: både spelare och givare har ett namn och en hand,
