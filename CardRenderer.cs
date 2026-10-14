@@ -6,6 +6,9 @@ public static class CardRenderer
     // Bredden innanför ramen. Hela kortet blir 7 + 2 = 9 tecken.
     private const int InnerWidth = 7;
 
+    // Mönstret på kortets baksida.
+    private const char BackPattern = '▒';
+
     public static string[] RenderCard(Card card)
     {
         string rank = RankLabel(card.Rank);
@@ -13,15 +16,44 @@ public static class CardRenderer
 
         return
         [
-            "┌" + new string('─', InnerWidth) + "┐",
-            "│" + rank.PadRight(InnerWidth) + "│",
-            "│" + new string(' ', InnerWidth) + "│",
-            "│" + Center(middle) + "│",
-            "│" + new string(' ', InnerWidth) + "│",
-            "│" + rank.PadLeft(InnerWidth) + "│",
-            "└" + new string('─', InnerWidth) + "┘"
+            TopBorder(),
+            Row(rank.PadRight(InnerWidth)),
+            EmptyRow(),
+            Row(Center(middle)),
+            EmptyRow(),
+            Row(rank.PadLeft(InnerWidth)),
+            BottomBorder()
         ];
     }
+
+    // Givarens hålkort: samma ram, men baksidan upp.
+    public static string[] RenderFaceDown()
+    {
+        string back = new string(BackPattern, InnerWidth);
+
+        return
+        [
+            TopBorder(),
+            Row(back),
+            Row(back),
+            Row(back),
+            Row(back),
+            Row(back),
+            BottomBorder()
+        ];
+    }
+
+    // --- Ramen, gemensam för alla kort ---
+
+    private static string TopBorder() => "┌" + new string('─', InnerWidth) + "┐";
+
+    private static string BottomBorder() => "└" + new string('─', InnerWidth) + "┘";
+
+    private static string Row(string content) => "│" + content + "│";
+
+    private static string EmptyRow() => Row(new string(' ', InnerWidth));
+
+    // --- Innehållet på kortets framsida ---
 
     // Texten i hörnen. Svenska bokstäver, eftersom användaren ser dem.
     private static string RankLabel(Rank rank)
