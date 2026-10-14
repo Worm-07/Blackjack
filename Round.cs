@@ -25,6 +25,9 @@ public class Round
         _askPlayer = askPlayer;
     }
 
+    /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
+    public IReadOnlyList<Player> Players => _players;
+
     /// <summary>
     /// Dela ut: två kort öppet till varje spelare, ett öppet och ett
     /// dolt till givaren.
