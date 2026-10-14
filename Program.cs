@@ -21,7 +21,8 @@ while (true)
     {
         // US08: en runda. US11: spelarens beslut (köpa/stanna) levereras
         // till Round som Func<Player, Move> – Round pratar aldrig med Console.
-        Round round = game.PlayRound(ui.ReadMove);
+        // Givarens hand visas via ShowDealer (hålkortet dolt tills det vänts).
+        Round round = game.PlayRound(ui.ReadMove, ui.ShowDealer);
 
         // US09: visa resultatet för varje spelare (Round visar själv aldrig).
         foreach (Player p in round.Players)
