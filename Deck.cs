@@ -1,14 +1,15 @@
 /*
- ***US05: Deck – blanda, dela ut, hålla koll på korten***
+ ***US05 + US06: Deck – bygg & blanda leken, byt lek när den tar slut***
  ***Skelett – metoderna är markerade med TODO och ska implementeras.***
- ***Strukturkrav: ingen Console i regelklasser.***
+ ***Strukturkrav: ingen Console i regelklasser (US16).***
  */
 
 /// En kortlek med 52 kort. Bygger leken, blandar (Fisher-Yates),
 /// delar ut och håller koll på hur många kort som är kvar.
 public class Deck
 {
-    /// Färre än 15 kort kvar → ny blandad lek inför nästa runda.
+    /// US06: färre än 15 kort kvar → ny blandad lek inför nästa runda.
+    /// Bytet sker aldrig mitt i en runda.
     public const int ReshuffleThreshold = 15;
 
     private readonly List<Card> _cards = new();
@@ -68,7 +69,7 @@ public class Deck
     /// </summary>
     public void ReshuffleIfLow()
     {
-        // TODO US05: om (RemainingCards < ReshuffleThreshold) { BuildDeck(); Shuffle(); }
+        // TODO US06: om (RemainingCards < ReshuffleThreshold) { BuildDeck(); Shuffle(); }
         throw new NotImplementedException();
     }
 }
