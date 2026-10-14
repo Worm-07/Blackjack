@@ -1,6 +1,5 @@
 /*
  ***US05 + US06: Deck – bygg & blanda leken, byt lek när den tar slut***
- ***Skelett – metoderna är markerade med TODO och ska implementeras.***
  ***Strukturkrav: ingen Console i regelklasser (US16).***
  */
 
@@ -51,16 +50,22 @@ public class Deck
     /// </summary>
     public void Shuffle()
     {
-        // TODO US05: for (int i = _cards.Count - 1; i > 0; i--)
-        //            { int j = _random.Next(i + 1); byt plats på _cards[i] och _cards[j]; }
-        throw new NotImplementedException();
+        for (int i = _cards.Count - 1; i > 0; i--)
+        {
+            int j = _random.Next(i + 1);
+            (_cards[i], _cards[j]) = (_cards[j], _cards[i]);
+        }
     }
 
     /// <summary>Tar bort och returnerar nästa kort i leken.</summary>
     public Card Deal()
     {
-        // TODO US05: kasta exception om IsEmpty, annars ta bort sista kortet och returnera det
-        throw new NotImplementedException();
+        if (IsEmpty)
+            throw new InvalidOperationException("Leken är tom.");
+
+        Card card = _cards[^1];
+        _cards.RemoveAt(_cards.Count - 1);
+        return card;
     }
 
     /// <summary>
@@ -69,7 +74,10 @@ public class Deck
     /// </summary>
     public void ReshuffleIfLow()
     {
-        // TODO US06: om (RemainingCards < ReshuffleThreshold) { BuildDeck(); Shuffle(); }
-        throw new NotImplementedException();
+        if (RemainingCards < ReshuffleThreshold)
+        {
+            BuildDeck();
+            Shuffle();
+        }
     }
 }
