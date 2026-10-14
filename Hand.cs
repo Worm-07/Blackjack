@@ -1,6 +1,5 @@
 /*
  ***US07 + US08 + US09: Hand – värde, mjuk/hård, spräckt, naturlig 21***
- ***Skelett – metoderna är markerade med TODO och ska implementeras.***
  */
 
 /// En hand (en samling kort). Beräknar sitt eget värde och vet om den är
@@ -29,10 +28,8 @@ public class Hand
     /// </summary>
     public int GetValue()
     {
-        // TODO US07:
-        // 1. Summera alla kort med GetCardValue (ess som 11).
-        // 2. Så länge summan > 21 och det finns ess: dra ifrån 10 (ess 11 → 1).
-        throw new NotImplementedException();
+        (int value, _) = ComputeValue();
+        return value;
     }
 
     /// <summary>
@@ -43,9 +40,9 @@ public class Hand
     {
         get
         {
-            // TODO US08: summera med ess som 11; om summan > 21 måste minst
-            // ett ess sänkas till 1 → hård hand, annars mjuk.
-            throw new NotImplementedException();
+            // Mjuk om minst ett ess fortfarande räknas som 11 i värdet.
+            (_, int softAces) = ComputeValue();
+            return softAces > 0;
         }
     }
 
@@ -54,8 +51,7 @@ public class Hand
     {
         get
         {
-            // TODO US09: return GetValue() > 21;
-            throw new NotImplementedException();
+            return GetValue() > 21;
         }
     }
 
@@ -67,8 +63,7 @@ public class Hand
     {
         get
         {
-            // TODO US09: return Count == 2 && GetValue() == 21;
-            throw new NotImplementedException();
+            return Count == 2 && GetValue() == 21;
         }
     }
 
@@ -78,7 +73,36 @@ public class Hand
     /// </summary>
     private static int GetCardValue(Card card)
     {
-        // TODO US07: 2–10 → sitt värde, Jack/Queen/King → 10, Ace → 11
-        throw new NotImplementedException();
+        return card.Rank switch
+        {
+            Rank.Jack or Rank.Queen or Rank.King => 10,
+            Rank.Ace => 11,
+            _ => (int)card.Rank // 2–10 har sitt eget värde i enumen
+        };
+    }
+
+    /// <summary>
+    /// Räknar ut handens värde. Returnerar värdet och hur många ess som
+    /// fortfarande räknas som 11. Summerar först med alla ess som 11 och
+    /// sänker ess till 1 (−10) så länge summan överstiger 21.
+    /// </summary>
+    private (int Value, int SoftAces) ComputeValue()
+    {
+        int value = 0;
+        int aces = 0;
+        foreach (Card card in _cards)
+        {
+            value += GetCardValue(card);
+            if (card.Rank == Rank.Ace)
+                aces++;
+        }
+
+        while (value > 21 && aces > 0)
+        {
+            value -= 10; // ess 11 → 1
+            aces--;
+        }
+
+        return (value, aces);
     }
 }
