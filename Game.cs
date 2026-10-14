@@ -1,32 +1,43 @@
-class Game
+using System.Linq;
+
+public class Game
 {
-    public enum MenuChoice { StartNewRound, StartExistingRound, ShowStatistic, Quit }
+    private readonly List<Player> _savedPlayers;
+    private readonly List<Player> _seatedPlayers = new List<Player>();
 
-    private Consoleui _ui = new Consoleui();
-
-    public void Run()
+    public Game(List<Player> savedPlayers)
     {
-        bool running = true;
+        _savedPlayers = savedPlayers;
+    }
 
-        while (running)
-        {
-            MenuChoice choice = _ui.Menu();
+    // Alla sparade spelare, så att GameStorage kan spara dem
+    public IReadOnlyList<Player> SavedPlayers => _savedPlayers;
 
-            switch (choice)
-            {
-                case MenuChoice.StartNewRound:
-                    // Starta ny runda när Round finns
-                    break;
-                case MenuChoice.StartExistingRound:
-                    // Återuppta senaste spelet
-                    break;
-                case MenuChoice.ShowStatistic:
-                    // Visa statestik
-                    break;
-                case MenuChoice.Quit:
-                    running = false;
-                    break;
-            }
-        }
+    // Spelare som finns sparade men inte sitter vid bordet
+    public List<Player> GetAvailablePlayers()
+    {
+        return _savedPlayers.Where(p => !_seatedPlayers.Contains(p)).ToList();
+    }
+
+    // Returnerar sparad spelare om namnet finns, annars en ny.
+    // Returnerar null om spelaren redan sitter vid bordet.
+    public Player? FindOrCreatePlayer(string name)
+    {
+        name = name.Trim();
+
+        Player? existing = _savedPlayers.FirstOrDefault(
+            p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (existing != null)
+            return _seatedPlayers.Contains(existing) ? null : existing;
+
+        Player newPlayer = new Player(name);
+        _savedPlayers.Add(newPlayer);
+        return newPlayer;
+    }
+
+    public void SeatPlayer(Player player)
+    {
+        _seatedPlayers.Add(player);
     }
 }
