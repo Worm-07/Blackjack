@@ -3,6 +3,9 @@
 /// Färgen (röd/svart) sätts i ConsoleUi, inte här.
 public static class CardRenderer
 {
+    // Mellanrummet mellan korten i en hand. Publik så att ConsoleUi kan använda samma.
+    public const string CardSpacing = " ";
+
     // Bredden innanför ramen. Hela kortet blir 7 + 2 = 9 tecken.
     private const int InnerWidth = 7;
 
@@ -11,9 +14,6 @@ public static class CardRenderer
 
     // Mönstret på kortets baksida.
     private const char BackPattern = '▒';
-
-    // Mellanrummet mellan korten i en hand.
-    private const string CardSpacing = " ";
 
     // Givarens hålkort är det andra kortet som delas ut (index 1).
     private const int HoleCardIndex = 1;
@@ -52,39 +52,20 @@ public static class CardRenderer
         ];
     }
 
-    // Ritar en hel hand med korten bredvid varandra.
-    // Med hideHoleCard = true ritas givarens hålkort med baksidan upp.
-    public static string[] RenderHand(IReadOnlyList<Card> cards, bool hideHoleCard = false)
+    // Avgör om kortet på en viss plats i handen ska visas med baksidan upp.
+    public static bool IsFaceDown(int index, bool hideHoleCard) => hideHoleCard && index == HoleCardIndex;
+
+    // Ritar varje kort i handen för sig. ConsoleUi använder den för att färga korten olika.
+    public static List<string[]> RenderCards(IReadOnlyList<Card> cards, bool hideHoleCard = false)
     {
         List<string[]> renderedCards = new List<string[]>();
 
         for (int i = 0; i < cards.Count; i++)
         {
-            bool isHidden = hideHoleCard && i == HoleCardIndex;
-            renderedCards.Add(isHidden ? RenderFaceDown() : RenderCard(cards[i]));
+            renderedCards.Add(IsFaceDown(i, hideHoleCard) ? RenderFaceDown() : RenderCard(cards[i]));
         }
 
-        return JoinSideBySide(renderedCards);
-    }
-
-    // Bygger rad 0 för alla kort, sedan rad 1 för alla kort, och så vidare.
-    private static string[] JoinSideBySide(List<string[]> renderedCards)
-    {
-        string[] lines = new string[CardHeight];
-
-        for (int row = 0; row < CardHeight; row++)
-        {
-            string[] parts = new string[renderedCards.Count];
-
-            for (int i = 0; i < renderedCards.Count; i++)
-            {
-                parts[i] = renderedCards[i][row];
-            }
-
-            lines[row] = string.Join(CardSpacing, parts);
-        }
-
-        return lines;
+        return renderedCards;
     }
 
     // --- Ramen, gemensam för alla kort ---
@@ -120,7 +101,7 @@ public static class CardRenderer
             Suit.Diamonds => "♦",
             Suit.Clubs => "♣",
             Suit.Spades => "♠",
-            _ => "?"
+            _ => throw new ArgumentOutOfRangeException(nameof(suit), suit, "Okänd färg.")
         };
     }
 
@@ -141,6 +122,11 @@ public static class CardRenderer
     // Placerar texten i mitten av det inre fältet.
     private static string Center(string text)
     {
+        if (text.Length > InnerWidth)
+        {
+            throw new ArgumentException($"Texten '{text}' får inte vara längre än {InnerWidth} tecken.", nameof(text));
+        }
+
         int left = (InnerWidth - text.Length) / 2;
         int right = InnerWidth - left - text.Length;
         return new string(' ', left) + text + new string(' ', right);
