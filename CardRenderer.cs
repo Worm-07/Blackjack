@@ -6,8 +6,17 @@ public static class CardRenderer
     // Bredden innanför ramen. Hela kortet blir 7 + 2 = 9 tecken.
     private const int InnerWidth = 7;
 
+    // Antal rader i ett kort.
+    private const int CardHeight = 7;
+
     // Mönstret på kortets baksida.
     private const char BackPattern = '▒';
+
+    // Mellanrummet mellan korten i en hand.
+    private const string CardSpacing = " ";
+
+    // Givarens hålkort är det andra kortet som delas ut (index 1).
+    private const int HoleCardIndex = 1;
 
     public static string[] RenderCard(Card card)
     {
@@ -41,6 +50,41 @@ public static class CardRenderer
             Row(back),
             BottomBorder()
         ];
+    }
+
+    // Ritar en hel hand med korten bredvid varandra.
+    // Med hideHoleCard = true ritas givarens hålkort med baksidan upp.
+    public static string[] RenderHand(IReadOnlyList<Card> cards, bool hideHoleCard = false)
+    {
+        List<string[]> renderedCards = new List<string[]>();
+
+        for (int i = 0; i < cards.Count; i++)
+        {
+            bool isHidden = hideHoleCard && i == HoleCardIndex;
+            renderedCards.Add(isHidden ? RenderFaceDown() : RenderCard(cards[i]));
+        }
+
+        return JoinSideBySide(renderedCards);
+    }
+
+    // Bygger rad 0 för alla kort, sedan rad 1 för alla kort, och så vidare.
+    private static string[] JoinSideBySide(List<string[]> renderedCards)
+    {
+        string[] lines = new string[CardHeight];
+
+        for (int row = 0; row < CardHeight; row++)
+        {
+            string[] parts = new string[renderedCards.Count];
+
+            for (int i = 0; i < renderedCards.Count; i++)
+            {
+                parts[i] = renderedCards[i][row];
+            }
+
+            lines[row] = string.Join(CardSpacing, parts);
+        }
+
+        return lines;
     }
 
     // --- Ramen, gemensam för alla kort ---
