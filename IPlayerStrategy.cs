@@ -1,0 +1,16 @@
+/*
+ ***Tillval 2 (US13): Datorspelare med strategi***
+ ***Skelett – implementera TODO:erna i strategiklasserna.***
+ */
+
+/// Gemensamt gränssnitt för datorspelares strategier.
+/// Polymorfism som gör något begripligt: samma anrop, olika beteende –
+/// och utbytbart under körning. Flera datorspelare kan ha olika
+/// strategier samtidigt.
+public interface IPlayerStrategy
+{
+    /// <summary>
+    /// Bestäm nästa drag utifrån spelarens hand och givarens öppna kort.
+    /// </summary>
+    Move Decide(Player player, Card dealerUpCard);
+}
