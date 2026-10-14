@@ -39,6 +39,7 @@ public class Round
     {
         foreach (var player in _players)
         {
+            player.Hand.Clear(); // ny runda: handen startar tom
             player.AddCard(_deck.Deal());
             player.AddCard(_deck.Deal());
         }
