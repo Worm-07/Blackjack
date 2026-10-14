@@ -1,10 +1,10 @@
 /*
- ***US07: Player – ärver Participant***
+ ***US10: Player – ärver Participant***
  ***Skelett – implementera TODO:erna.***
  */
 
 /// En spelare som sitter vid bordet. Ärver namn och hand från
-/// Participant (US07) och har sin egen statistik.
+/// Participant (US10) och har sin egen statistik.
 public class Player : Participant
 {
     public int Wins { get; private set; }
@@ -15,7 +15,7 @@ public class Player : Participant
     {
     }
 
-    // Används av GameStorage (US10) när resultat läses in ur filen.
+    // Används av GameStorage (US19) när resultat läses in ur filen.
     public Player(string name, int wins, int losses, int pushes) : base(name)
     {
         Wins = wins;

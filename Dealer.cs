@@ -1,11 +1,12 @@
 /*
- ***US07: Dealer – hålkortet och den fasta regeln***
+ ***US12: Dealer – hålkortet och den fasta regeln***
  ***Skelett – implementera TODO:erna.***
  */
 
 /// Givaren ärver Participant. I stället för ett eget beslut följer
 /// givaren en fast regel: köpa medan handens värde är 16 eller lägre,
-/// stanna på 17 eller högre – även om det är en mjuk 17 (grundversionen).
+/// stanna på 17 eller högre – även om det är en mjuk 17 (grundversionen;
+/// US25 gör mjuk 17 inställbar via RuleSet).
 public class Dealer : Participant
 {
     public Dealer(string name = "Given") : base(name)
@@ -17,7 +18,7 @@ public class Dealer : Participant
     {
         get
         {
-            // TODO US07: return Hand.Count >= 1 ? Hand.Cards[0] : null;
+            // TODO US12: return Hand.Count >= 1 ? Hand.Cards[0] : null;
             throw new NotImplementedException();
         }
     }
@@ -27,18 +28,18 @@ public class Dealer : Participant
     {
         get
         {
-            // TODO US07: return Hand.Count >= 2 ? Hand.Cards[1] : null;
+            // TODO US12: return Hand.Count >= 2 ? Hand.Cards[1] : null;
             throw new NotImplementedException();
         }
     }
 
     /// Givarens fasta regel: ska givaren köpa?
-    /// Designfråga 4: regeln ligger på Dealer, inte i Round.
+    /// Designfråga (US12): regeln ligger på Dealer, inte i Round.
     public bool ShouldHit
     {
         get
         {
-            // TODO US07 (kräver US06): return Hand.GetValue() <= 16;
+            // TODO US12 (kräver US07): return Hand.GetValue() <= 16;
             throw new NotImplementedException();
         }
     }

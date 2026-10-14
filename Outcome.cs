@@ -1,8 +1,9 @@
 /*
- ***US07: Outcome – hur en spelares runda slutar***
+ ***US15: Outcome – hur en spelares runda slutar***
  */
 
-/// Utfallet av en runda i förhållande till givaren.
+/// Utfallet av en runda i förhållande till givaren (US15):
+/// Win, Lose, Push eller Blackjack.
 public enum Outcome
 {
     /// Vinst.

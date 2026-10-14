@@ -1,11 +1,11 @@
 /*
- ***US07: Participant – gemensam bas för Player och Dealer***
+ ***US10: Participant – gemensam bas för Player och Dealer***
  ***Skelett – implementera TODO:erna.***
  */
 
 /// Gemensam bas: både spelare och givare har ett namn och en hand,
 /// och kan ta emot kort.
-/// Designfråga 2: givaren är "en delvis spelare" – de delar namn, hand
+/// Designfråga (US10): givaren är "en delvis spelare" – de delar namn, hand
 /// och att de kan spräcka. Inte delat: beslutet (givaren har en fast
 /// regel) och hålkortet.
 /// Strukturkrav: ingen in-/utmatering här.
@@ -27,6 +27,6 @@ public class Participant
         Hand.AddCard(card);
     }
 
-    /// Har handen över 21? (US06)
+    /// Har handen över 21? (US09)
     public bool IsBusted => Hand.IsBusted;
 }
