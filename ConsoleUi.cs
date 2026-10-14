@@ -53,9 +53,16 @@ class ConsoleUi
         while (true)
         {
             Console.Write(prompt);
-            string input = Console.ReadLine() ?? "";
-            if (isValid(input))
-                return input;
+            string? line = Console.ReadLine();
+            if (line == null)
+            {
+                // Inmatningen tog slut (EOF – t.ex. Ctrl+Z eller pipad
+                // inmatning som slutat). Avsluta vänligt istället för att
+                // fråga om i oändlighet.
+                Environment.Exit(0);
+            }
+            if (isValid(line))
+                return line;
             Console.WriteLine(errorMessage);
         }
     }
