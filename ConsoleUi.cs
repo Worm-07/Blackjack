@@ -68,7 +68,7 @@ class ConsoleUi
             "Köpa (k) eller stanna (s)? ",
             " === K ELLER S ===",
             s => s.Length == 1 && (s[0] is 'k' or 'K' or 's' or 'S'))
-            .StartsWith('k', StringComparison.OrdinalIgnoreCase)
+            .StartsWith("k", StringComparison.OrdinalIgnoreCase)
             ? Move.Hit : Move.Stand;
     }
 
