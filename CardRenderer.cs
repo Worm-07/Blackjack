@@ -9,9 +9,6 @@ public static class CardRenderer
     // Bredden innanför ramen. Hela kortet blir 7 + 2 = 9 tecken.
     private const int InnerWidth = 7;
 
-    // Antal rader i ett kort.
-    private const int CardHeight = 7;
-
     // Mönstret på kortets baksida.
     private const char BackPattern = '▒';
 
