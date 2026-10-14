@@ -1,6 +1,5 @@
 /*
  ***US08: Round – en giv från start till avgörande***
- ***Skelett – metoderna är markerade med TODO och ska implementeras.***
  */
 
 /// En giv (en runda): korten delas ut, spelarna tar sina beslut i tur
@@ -32,11 +31,13 @@ public class Round
     /// </summary>
     public void DealCards()
     {
-        // TODO US08:
-        // foreach (var player in _players) { player.AddCard(_deck.Deal()); player.AddCard(_deck.Deal()); }
-        // _dealer.AddCard(_deck.Deal()); // upcard
-        // _dealer.AddCard(_deck.Deal()); // hole card
-        throw new NotImplementedException();
+        foreach (var player in _players)
+        {
+            player.AddCard(_deck.Deal());
+            player.AddCard(_deck.Deal());
+        }
+        _dealer.AddCard(_deck.Deal()); // upcard
+        _dealer.AddCard(_deck.Deal()); // hole card
     }
 
     /// <summary>
@@ -45,10 +46,11 @@ public class Round
     /// </summary>
     public void PlayPlayers()
     {
-        // TODO US08:
-        // foreach (var player in _players)
-        //     while (!player.IsBusted && _askPlayer(player) == Move.Hit) player.AddCard(_deck.Deal());
-        throw new NotImplementedException();
+        foreach (var player in _players)
+        {
+            while (!player.IsBusted && _askPlayer(player) == Move.Hit)
+                player.AddCard(_deck.Deal());
+        }
     }
 
     /// <summary>
@@ -57,8 +59,8 @@ public class Round
     /// </summary>
     public void PlayDealer()
     {
-        // TODO US08: while (_dealer.ShouldHit) _dealer.AddCard(_deck.Deal());
-        throw new NotImplementedException();
+        while (_dealer.ShouldHit)
+            _dealer.AddCard(_deck.Deal());
     }
 
     /// <summary>
@@ -71,15 +73,50 @@ public class Round
     /// </summary>
     public Outcome Settle(Player player)
     {
-        // TODO US08 (kräver US06: Hand)
-        throw new NotImplementedException();
+        if (player.IsBusted)
+            return Outcome.Lose;
+
+        if (player.Hand.IsNatural && !_dealer.Hand.IsNatural)
+            return Outcome.Blackjack;
+
+        if (_dealer.IsBusted)
+            return Outcome.Win;
+
+        if (_dealer.Hand.IsNatural)
+            return Outcome.Push;
+
+        int playerValue = player.Hand.GetValue();
+        int dealerValue = _dealer.Hand.GetValue();
+
+        if (playerValue > dealerValue)
+            return Outcome.Win;
+        if (playerValue < dealerValue)
+            return Outcome.Lose;
+        return Outcome.Push;
     }
 
     /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
     public void Play()
     {
-        // TODO US08: DealCards(); PlayPlayers(); PlayDealer();
-        // därefter Settle per spelare → uppdatera Wins/Losses/Pushes
-        throw new NotImplementedException();
+        DealCards();
+        PlayPlayers();
+        PlayDealer();
+
+        foreach (var player in _players)
+        {
+            switch (Settle(player))
+            {
+                case Outcome.Win:
+                case Outcome.Blackjack:
+                    player.RecordWin();
+                    break;
+                case Outcome.Lose:
+                    player.RecordLoss();
+                    break;
+                case Outcome.Push:
+                    player.RecordPush();
+                    break;
+            }
+        }
     }
 }
