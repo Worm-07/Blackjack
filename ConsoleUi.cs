@@ -1,3 +1,5 @@
+using System.Linq;
+
 /*
  ***US11: ConsoleUi – all inmatning och utmatning***
  ***US01-koden (antal + namn) behålls; US11 lägger till
@@ -69,7 +71,7 @@ class ConsoleUi
             "Köpa (k) eller stanna (s)? ",
             " === K ELLER S ===",
             s => s.Length == 1 && (s[0] is 'k' or 'K' or 's' or 'S'))
-            .StartsWith('k', StringComparison.OrdinalIgnoreCase)
+            .StartsWith("k", StringComparison.OrdinalIgnoreCase)
             ? Move.Hit : Move.Stand;
     }
 
@@ -113,6 +115,10 @@ class ConsoleUi
 
     // ---------- US03: huvudmeny ----------
 
+    /// <summary>Antal spelare som sitter vid bordet (sparade minus tillgängliga).</summary>
+    private static int SeatedCount(Game game)
+        => game.SavedPlayers.Count - game.GetAvailablePlayers().Count;
+
     /// <summary>
     /// Huvudmenyn: spela runda / spelare (visa, lägga till) / avsluta.
     /// Returnerar true om spelaren ska spela en runda, false om programmet
@@ -136,7 +142,7 @@ class ConsoleUi
             switch (choice)
             {
                 case "1":
-                    if (game.SeatedPlayers.Count == 0)
+                    if (SeatedCount(game) == 0)
                     {
                         Console.WriteLine(
                             " === INGA SPELARE VID BORDET – LÄGG TILL SPELARE (VAL 2) ===");
@@ -158,27 +164,31 @@ class ConsoleUi
     /// och ger möjlighet att lägga till nya.</summary>
     private void ShowPlayers(Game game)
     {
+        List<Player> available = game.GetAvailablePlayers();
+        List<Player> seated = game.SavedPlayers
+            .Where(p => !available.Contains(p)).ToList();
+
         Console.WriteLine();
         Console.WriteLine("Spelare vid bordet:");
-        if (game.SeatedPlayers.Count == 0)
+        if (seated.Count == 0)
         {
             Console.WriteLine("  (inga)");
         }
         else
         {
-            foreach (Player p in game.SeatedPlayers)
+            foreach (Player p in seated)
                 Console.WriteLine($"  {p.Name}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
         }
 
         Console.WriteLine();
         Console.WriteLine("Tillgängliga spelare:");
-        if (game.GetAvailablePlayers().Count == 0)
+        if (available.Count == 0)
         {
             Console.WriteLine("  (inga)");
         }
         else
         {
-            foreach (Player p in game.GetAvailablePlayers())
+            foreach (Player p in available)
                 Console.WriteLine($"  {p.Name}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
         }
 
