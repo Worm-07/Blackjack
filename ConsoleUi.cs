@@ -109,6 +109,8 @@ class ConsoleUi
             _ => "?"
         };
         Console.WriteLine($"{player.Name}: {text}");
+    }
+
     // ---------- US03: huvudmeny ----------
 
     /// <summary>
@@ -208,7 +210,5 @@ class ConsoleUi
             Console.WriteLine($" {name} sitter nu vid bordet.");
         }
         players.Clear();
-    }
-}
     }
 }
