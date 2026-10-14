@@ -22,6 +22,12 @@ public class Hand
         _cards.Add(card);
     }
 
+    /// <summary>Tömmer handen – används när en ny runda startar.</summary>
+    public void Clear()
+    {
+        _cards.Clear();
+    }
+
     /// <summary>
     /// Handens totala värde: 2–10 sitt eget värde, klätt = 10,
     /// ess = 1 eller 11 – det som är bäst utan att spräcka.
