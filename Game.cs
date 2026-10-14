@@ -67,12 +67,18 @@ public class Game
     /// </summary>
     public void PlayRound(Func<Player, Move> askPlayer)
     {
-        // TODO US09 (kräver US05 Deck, US07 Move, US08 Round):
-        // if (_deck == null || _deck.RemainingCards < 15)
-        //     _deck = new Deck(_random);
-        //
-        // Round round = new(_deck, _seatedPlayers, askPlayer);
-        // round.Play();
-        throw new NotImplementedException();
+        // Ny lek vid första rundan; blandas om när korten tar slut
+        // (US05: färre än 15 kort kvar → ny blandad lek).
+        if (_deck == null)
+        {
+            _deck = new Deck(_random);
+        }
+        else
+        {
+            _deck.ReshuffleIfLow();
+        }
+
+        Round round = new(_deck, _seatedPlayers, askPlayer);
+        round.Play();
     }
 }

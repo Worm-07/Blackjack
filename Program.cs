@@ -12,14 +12,12 @@ Random random = new();
 List<Player> players = new GameStorage().LoadPlayers();
 
 Game game = new(players, random);
-Consoleui ui = new();
+ConsoleUi ui = new();
 
 // Spelloopen: meny (US03) → runda (US08) → spara (US10).
 while (true)
 {
-    // TODO US09: menyn ligger i branch US03-Menu (ShowMenu i Consoleui):
-    // 1) Spela runda  2) Spelare (visa/lägg till)  3) Avsluta
-    if (ui.ShowMenu())
+    if (ui.ShowMenu(game))
     {
         // US08: en runda. US11: spelarens beslut (köpa/stanna) levereras
         // till Round som Func<Player, Move> – Round pratar aldrig med Console.
