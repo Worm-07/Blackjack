@@ -19,14 +19,14 @@ class ConsoleUi
 
     // ---------- US01: antal och namn på spelare ----------
 
-    public void Print()
+            public void Print(int maxPlayers = 5)
     {
-        Console.WriteLine("1 - 5 spelare");
+        Console.WriteLine($"1 - {maxPlayers} spelare");
         NumbersOfPlayers = int.Parse(
             ReadUntilValid(
                 "Välj antalet spelare: ",
-                " === ANGE ETT NUMMER MELLAN 1 OCH 5 ===",
-                s => int.TryParse(s, out int n) && n is >= 1 and <= 5));
+                $" === ANGE ETT NUMMER MELLAN 1 OCH {maxPlayers} ===",
+                s => int.TryParse(s, out int n) && n >= 1 && n <= maxPlayers));
     }
 
     public void NamesOfPlayers()
@@ -201,7 +201,15 @@ class ConsoleUi
     /// spelarna ner vid bordet.</summary>
     private void AddSeatedPlayers(Game game)
     {
-        Print();          // US01: antal spelare (1–5), validerat
+                // Max 5 spelare vid bordet totalt, inte bara per gång.
+        int freeSeats = 5 - SeatedCount(game);
+        if (freeSeats == 0)
+        {
+            Console.WriteLine(" === BORDET ÄR FULLT – MAX 5 SPELARE ===");
+            return;
+        }
+
+        Print(freeSeats); // US01: antal spelare, validerat
         NamesOfPlayers(); // US01/US11: namn, validerat
 
         foreach (string name in players)
