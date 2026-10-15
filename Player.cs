@@ -19,7 +19,7 @@ public class Player : Participant
         Chips = new ChipWallet();
     }
 
-    // Används av GameStorage (US10) när resultat läses in ur filen.
+    // Används av GameStorage (US19) när resultat läses in ur filen.
     // TODO Tillval 4: lägg till chips i filformatet.
     public Player(string name, int wins, int losses, int pushes) : base(name)
     {
