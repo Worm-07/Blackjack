@@ -1,17 +1,31 @@
 using System.Linq;
 
+/*
+ ***US09: Game – meny, spelare och spelloop***
+ ***US01/US02-koden behålls; US09 lägger till rundor.***
+ */
+
 public class Game
 {
     private readonly List<Player> _savedPlayers;
     private readonly List<Player> _seatedPlayers = new List<Player>();
+    private readonly Random _random;
 
-    public Game(List<Player> savedPlayers)
+    // Decken delas över rundorna så att regeln "blanda om vid <15 kort"
+    // gäller mellan rundor, inte bara inom en.
+    private Deck? _deck;
+
+    public Game(List<Player> savedPlayers, Random random)
     {
         _savedPlayers = savedPlayers;
+        _random = random;
     }
 
     // Alla sparade spelare, så att GameStorage kan spara dem
     public IReadOnlyList<Player> SavedPlayers => _savedPlayers;
+
+    // Spelare som sitter vid bordet (spelar i nästa runda)
+    public IReadOnlyList<Player> SeatedPlayers => _seatedPlayers;
 
     // Spelare som finns sparade men inte sitter vid bordet
     public List<Player> GetAvailablePlayers()
@@ -39,5 +53,36 @@ public class Game
     public void SeatPlayer(Player player)
     {
         _seatedPlayers.Add(player);
+    }
+
+    /*
+    ***US09: Spela en runda***
+    */
+
+    /// <summary>
+    /// Spela en runda med alla spelare som sitter vid bordet.
+    /// Decken skapas vid första rundan och blandas om när färre än 15
+    /// kort är kvar. Spelarens beslut (köpa/stanna) skickas in som en
+    /// funktion – Round pratar aldrig direkt med Console.
+    /// Returnerar rundan så att loopen kan visa avgörandet för varje
+    /// spelare (Settle är ren – samma svar före och efter Play()).
+    /// </summary>
+    public Round PlayRound(Func<Player, Move> askPlayer,
+        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
+    {
+        // Ny lek vid första rundan; blandas om när korten tar slut
+        // (US05: färre än 15 kort kvar → ny blandad lek).
+        if (_deck == null)
+        {
+            _deck = new Deck(_random);
+        }
+        else
+        {
+            _deck.ReshuffleIfLow();
+        }
+
+        Round round = new(_deck, _seatedPlayers, askPlayer, showDealer, showBusted);
+        round.Play();
+        return round;
     }
 }
