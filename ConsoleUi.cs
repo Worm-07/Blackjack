@@ -80,18 +80,14 @@ class ConsoleUi
     /// <summary>Visa en spelares hand: korten + totalt värde.</summary>
     public void ShowHand(Player player)
     {
-        foreach (Card card in player.Hand.Cards)
-            Console.WriteLine($"  {card}");
+        ShowHand(player.Hand.Cards);
         Console.WriteLine($"{player.Name}: {player.Hand.GetValue()}");
     }
 
     /// <summary>Visa givarens hand. Hålkortet visas som ?? tills det vänts.</summary>
     public void ShowDealer(Dealer dealer, bool holeRevealed = false)
     {
-        string hole = holeRevealed
-            ? dealer.HoleCard?.ToString() ?? "??"
-            : "??";
-        Console.WriteLine($"  {dealer.UpCard}  {hole}");
+        ShowHand(dealer.Hand.Cards, hideHoleCard: !holeRevealed);
 
         // Värdet visas först när hålkortet är vänt – annars skulle
         // hålkortet "läcka" genom summan.
