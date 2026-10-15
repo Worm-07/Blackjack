@@ -60,8 +60,12 @@ public class Deck
     /// <summary>Tar bort och returnerar nästa kort i leken.</summary>
     public Card Deal()
     {
-        if (IsEmpty)
-            throw new InvalidOperationException("Leken är tom.");
+                if (IsEmpty)
+        {
+            // Leken tog slut mitt i en runda: ta fram en ny, blandad lek.
+            BuildDeck();
+            Shuffle();
+        }
 
         Card card = _cards[^1];
         _cards.RemoveAt(_cards.Count - 1);
