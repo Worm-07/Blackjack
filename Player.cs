@@ -1,20 +1,11 @@
 /*
-US16-Shoe-card-counting
- ***US16 (Tillval 5): Player med korträkning***
- ***Skelett – implementera TODO:erna.***
- 
-
-/// En spelare som sitter vid bordet. Ärver namn och hand från
-/// Participant och har sin egen statistik och sin egen korträknare.
-/// Räknaren är en ren observatör – den påverkar aldrig spelet.
-
  ***US10: Player – ärver Participant***
- 
+ ***US16 (Tillval 5): Player med korträkning***
+ */
 
 /// En spelare som sitter vid bordet. Ärver namn och hand från
-/// Participant (US10) och har sin egen statistik.
-dev
-*/
+/// Participant (US10) och har sin egen statistik och sin egen korträknare.
+/// Räknaren är en ren observatör – den påverkar aldrig spelet.
 public class Player : Participant
 {
     public int Wins { get; private set; }
@@ -32,12 +23,6 @@ public class Player : Participant
     // Används av GameStorage (US10) när resultat läses in ur filen.
     public Player(string name, int wins, int losses, int pushes,
         int decksInShoe = 1) : base(name)
-    public Player(string name) : base(name)
-    {
-    }
-
-    // Används av GameStorage (US19) när resultat läses in ur filen.
-    public Player(string name, int wins, int losses, int pushes) : base(name)
     {
         Wins = wins;
         Losses = losses;
@@ -51,7 +36,7 @@ public class Player : Participant
     /// <summary>Räkna en förlorad runda.</summary>
     public void RecordLoss() => Losses++;
 
-    /// <summary>Räkna en lika runda.</summary>
+    /// <summary>Räkna en lika runda (räknas varken som vinst eller förlust).</summary>
     public void RecordPush() => Pushes++;
 
     /// <summary>
@@ -63,13 +48,4 @@ public class Player : Participant
         // TODO Tillval 5: Counter.CardSeen(card);
         throw new NotImplementedException();
     }
-
-    /// <summary>Räkna en vunnen runda.</summary>
-    public void RecordWin() => Wins++;
-
-    /// <summary>Räkna en förlorad runda.</summary>
-    public void RecordLoss() => Losses++;
-
-    /// <summary>Räkna en lika runda (räknas varken som vinst eller förlust).</summary>
-    public void RecordPush() => Pushes++;
 }
