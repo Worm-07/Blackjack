@@ -95,7 +95,7 @@ public class Round
             return Outcome.Win;
 
         if (_dealer.Hand.IsNatural)
-            return Outcome.Push;
+                        return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
 
         int playerValue = player.Hand.GetValue();
         int dealerValue = _dealer.Hand.GetValue();
