@@ -79,22 +79,7 @@ public class Card
     }
 }
 
-/// En standardkortlek med 52 kort (4 färger × 13 valörer).
-/// Kan utvecklas vidare med större kortlek senare.
-public class Deck
-{
-    public List<Card> Cards { get; }
-
-    public Deck()
-    {
-        Cards = new List<Card>(52); // Förväntar sig 52 kort i en standardkortlek.
-        foreach (Suit suit in Enum.GetValues<Suit>()) // Loopar igenom alla färger
-        {
-            foreach (Rank rank in Enum.GetValues<Rank>()) // Loopar igenom alla valörer
-            {
-                Cards.Add(new Card(suit, rank)); // Skapar ett nytt kort och lägger till det i kortleken.
-            }
-        }
-    }
-}
+// US05: Deck flyttad till Deck.cs – den har eget ansvar (blandning,
+// deal, korträkning) och egen Random. Denna fil innehåller bara
+// Suit, Rank och Card.
 
