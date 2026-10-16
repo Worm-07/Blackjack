@@ -11,7 +11,11 @@ Random random = new();
 // US10: ladda tidigare spelare (namn + statistik) ur filen.
 List<Player> players = new GameStorage().LoadPlayers();
 
-Game game = new(players, random);
+// Tillval 3: Läs husreglerna från rules.txt. Saknas filen används
+// standardvärden. ConsoleUi visar reglerna och eventuella meddelanden.
+RuleSet rules = RuleSet.LoadFromFile();
+
+Game game = new(players, random, rules);
 ConsoleUi ui = new();
 
 // Spelloopen: meny (US03) → runda (US08) → spara (US10).
