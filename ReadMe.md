@@ -34,9 +34,13 @@ den branchen är mergad till dev.
 | Gruppmedlem | Tillval | Branch |
 |---|---|---|
 | (fyll i) | (1–5) | (US12–US16) |
+| Andreas | 3. Husregler från konfigurationsfil | feature-house-rules |
 
 ## Regler som gäller
 
+Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer
+specen. Saknas filen eller är ett värde fel används standardvärdet och en
+varning visas.
 Enligt specen i uppgiftsbeskrivningen (52 kort, givaren stannar på mjuk 17,
 naturlig 21 betalar enligt avgörandetabellen, omblandning vid <15 kort).
 Avvikelser från specifikationen listas här:
