@@ -17,6 +17,7 @@ RuleSet rules = RuleSet.LoadFromFile();
 
 Game game = new(players, random, rules);
 ConsoleUi ui = new();
+ui.ShowRules(rules);
 
 // Spelloopen: meny (US03) → runda (US08) → spara (US10).
 while (true)

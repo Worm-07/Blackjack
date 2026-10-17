@@ -109,6 +109,30 @@ class ConsoleUi
         Console.WriteLine($"{player.Name}: {text}");
     }
 
+      // ---------- Tillval 3: husregler ----------
+
+    /// <summary>
+    /// Visar husreglerna som gäller och eventuella meddelanden från
+    /// inläsningen (saknad fil, felaktiga rader).
+    /// </summary>
+    public void ShowRules(RuleSet rules)
+    {
+        foreach (string message in rules.Messages)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($" OBS: {message}");
+            Console.ResetColor();
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("=== Husregler ===");
+        Console.WriteLine($"  Antal lekar: {rules.NumberOfDecks}");
+        Console.WriteLine($"  Blandas om vid färre än {rules.ReshuffleThreshold} kort");
+        Console.WriteLine($"  Givaren {(rules.DealerHitsOnSoftSeventeen ? "drar" : "stannar")} på mjuk 17");
+        Console.WriteLine($"  Naturlig tjugoett {(rules.NaturalBeatsThreeCardTwentyOne ? "slår" : "slår inte")} 21 av tre kort");
+    }
+
+  
     // ---------- US03: huvudmeny ----------
 
     /// <summary>Antal spelare som sitter vid bordet (sparade minus tillgängliga).</summary>

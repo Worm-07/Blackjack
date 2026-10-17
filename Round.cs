@@ -81,9 +81,12 @@ public class Round
     /// <summary>
     /// Avgörande för en spelare (tabellen i specen):
     /// spelare spräckt → Lose
-    /// spelare naturlig 21 och givare inte → Blackjack
+    /// naturlig 21 på båda sidor → Push
+    /// spelare naturlig 21 → Blackjack (eller Push mot givarens 21 av tre kort,
+    ///   om husregeln NaturalBeatsThreeCardTwentyOne är avstängd)
     /// givare spräckt → Win
-    /// givare naturlig 21 → Push
+    /// givare naturlig 21 → Lose (eller Push mot spelarens 21 av tre kort,
+    ///   om husregeln är avstängd)
     /// annars: högre hand vinner; lika → Push
     /// </summary>
     public Outcome Settle(Player player)
@@ -91,48 +94,35 @@ public class Round
         if (player.IsBusted)
             return Outcome.Lose;
 
-        if (player.Hand.IsNatural && !_dealer.Hand.IsNatural)
+        bool playerNatural = player.Hand.IsNatural;
+        bool dealerNatural = _dealer.Hand.IsNatural;
+        int playerValue = player.Hand.GetValue();
+        int dealerValue = _dealer.Hand.GetValue();
+
+        if (playerNatural && dealerNatural)
+            return Outcome.Push;
+
+        if (playerNatural)
+        {
+            if (!_rules.NaturalBeatsThreeCardTwentyOne && dealerValue == 21)
+                return Outcome.Push;
             return Outcome.Blackjack;
+        }
 
         if (_dealer.IsBusted)
             return Outcome.Win;
 
-        if (_dealer.Hand.IsNatural)
-            return Outcome.Push;
-
-        int playerValue = player.Hand.GetValue();
-        int dealerValue = _dealer.Hand.GetValue();
+        if (dealerNatural)
+        {
+            if (!_rules.NaturalBeatsThreeCardTwentyOne && playerValue == 21)
+                return Outcome.Push;
+            return Outcome.Lose;
+        }
 
         if (playerValue > dealerValue)
             return Outcome.Win;
         if (playerValue < dealerValue)
             return Outcome.Lose;
         return Outcome.Push;
-    }
-
-    /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
-    public void Play()
-    {
-        DealCards();
-        _showDealer?.Invoke(_dealer, false); // öppet kort, hålkortet dolt
-        PlayPlayers();
-        PlayDealer();
-
-        foreach (var player in _players)
-        {
-            switch (Settle(player))
-            {
-                case Outcome.Win:
-                case Outcome.Blackjack:
-                    player.RecordWin();
-                    break;
-                case Outcome.Lose:
-                    player.RecordLoss();
-                    break;
-                case Outcome.Push:
-                    player.RecordPush();
-                    break;
-            }
-        }
     }
 }
