@@ -8,8 +8,11 @@
 /// US25 gör mjuk 17 inställbar via RuleSet).
 public class Dealer : Participant
 {
-    public Dealer(string name = "Given") : base(name)
+    private readonly bool _hitsOnSoftSeventeen;
+
+    public Dealer(RuleSet rules, string name = "Given") : base(name)
     {
+        _hitsOnSoftSeventeen = rules.DealerHitsOnSoftSeventeen;
     }
 
     /// Det öppna kortet (upcard).
@@ -36,7 +39,12 @@ public class Dealer : Participant
     {
         get
         {
-            return Hand.GetValue() <= 16;
+            int value = Hand.GetValue();
+            if (value <= 16)
+                return true;
+
+            // Husregel: drar givaren på mjuk 17 (t.ex. ess + 6)?
+            return _hitsOnSoftSeventeen && value == 17 && Hand.IsSoft;
         }
     }
 }

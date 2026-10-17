@@ -79,14 +79,14 @@ public class Game
         // (US05: färre än 15 kort kvar → ny blandad lek).
         if (_deck == null)
         {
-            _deck = new Deck(_random);
+            _deck = new Deck(_random, _rules);
         }
         else
         {
             _deck.ReshuffleIfLow();
         }
 
-        Round round = new(_deck, _seatedPlayers, askPlayer, showDealer, showBusted);
+        Round round = new(_deck, _rules, _seatedPlayers, askPlayer, showDealer, showBusted);
         round.Play();
         return round;
     }

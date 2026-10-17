@@ -18,12 +18,15 @@ public class Round
     private readonly Func<Player, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
-    private readonly Dealer _dealer = new();
+    private readonly Dealer _dealer;
+    private readonly RuleSet _rules;
 
-    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
+    public Round(Deck deck, RuleSet rules, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
         Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
+        _rules = rules;
+        _dealer = new Dealer(rules);
         _players = new List<Player>(players);
         _askPlayer = askPlayer;
         _showDealer = showDealer;
