@@ -1,6 +1,5 @@
 /*
  ***Tillval 4 (US15): Satsningar och marker***
- ***Skelett – metoderna är markerade med TODO och ska implementeras.***
  */
 
 /// En spelares plånbok: marker, satsning och utbetalning.
@@ -25,37 +24,43 @@ public class ChipWallet
     /// Satsa innan given. Dra ifrån markerna och spara insatsen.
     public void Bet(int amount)
     {
-        // TODO Tillval 4: kasta exception (eller kolla CanAfford först) om
-        // !CanAfford(amount); Balance -= amount; CurrentBet = amount;
-        throw new NotImplementedException();
+        if (CanAfford(amount))
+        {
+            Balance -= amount;
+            CurrentBet = amount;
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount), "Användaren försöker betta negativt, 0 eller över sitt saldo");
+        }
     }
 
     /// Vinst betalar 1:1 – insatsen tillbaka plus lika mycket till.
     public void CollectWin()
     {
-        // TODO Tillval 4: Balance += CurrentBet * 2; CurrentBet = 0;
-        throw new NotImplementedException();
+        Balance += CurrentBet * 2;
+        CurrentBet = 0;
     }
 
     /// Naturlig tjugoett betalar 3:2 – insatsen tillbaka + 1,5 × insatsen.
+    /// Heltalsdivisionen avrundar nedåt. 
     public void CollectBlackjack()
     {
-        // TODO Tillval 4: Balance += CurrentBet + (CurrentBet * 3) / 2; CurrentBet = 0;
-        throw new NotImplementedException();
+        Balance += CurrentBet + (CurrentBet * 3 / 2);
+        CurrentBet = 0;
     }
 
     /// Lika ger insatsen tillbaka.
     public void ReturnBet()
     {
-        // TODO Tillval 4: Balance += CurrentBet; CurrentBet = 0;
-        throw new NotImplementedException();
+        Balance += CurrentBet;
+        CurrentBet = 0;
     }
 
     /// Förlust: insatsen är redan borta (dragen vid Bet) – nollställ bara.
     public void CollectLoss()
     {
-        // TODO Tillval 4: CurrentBet = 0;
-        throw new NotImplementedException();
+        CurrentBet = 0;
     }
 
     /// En spelare som får slut på marker lämnar bordet.
