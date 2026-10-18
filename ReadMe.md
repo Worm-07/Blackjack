@@ -49,7 +49,9 @@ Avvikelser från specifikationen listas här:
 
 ## Klassdiagram
 
-Läggs in som `docs/klassdiagram.png` och ska spegla koden vid inlämning.
+![Klassdiagram](docs/klassdiagram.png)
+
+Källfilen finns i `docs/klassdiagram.mmd` och uppdateras när koden ändras.
 
 ## User stories
 
