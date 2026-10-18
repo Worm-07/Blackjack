@@ -33,7 +33,12 @@ den branchen är mergad till dev.
 
 | Gruppmedlem | Tillval | Branch |
 |---|---|---|
-| (fyll i) | (1–5) | (US12–US16) |
+| Hadi Bahaulddin | 1 – Kortgrafik | feature-card-graphics, US18-visa-hander |
+| (fyll i) | (1–5) | (branch) |
+
+**Tillval 1 – Kortgrafik (Hadi):** Jag gjorde så att korten visas som riktiga kort i terminalen, bredvid varandra. Hjärter och ruter är röda, klöver och spader är svarta. Givarens dolda kort visas med baksidan upp tills det vänds. CardRenderer ritar korten och ConsoleUi skriver ut dem i färg.
+
+Jag fixade också några buggar som vi hittade när vi testade: naturligt 21 mot 21 med tre kort, att spelet kraschade när korten tog slut, max 5 spelare vid bordet och att "Dama" skulle vara "Dam".
 
 ## Regler som gäller
 
