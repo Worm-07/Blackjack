@@ -16,10 +16,11 @@ class ConsoleUi
 {
     public List<string> players = [];
     public int NumbersOfPlayers;
+    public int BetAmount;
 
     // ---------- US01: antal och namn på spelare ----------
 
-            public void Print(int maxPlayers = 5)
+    public void Print(int maxPlayers = 5)
     {
         Console.WriteLine($"1 - {maxPlayers} spelare");
         NumbersOfPlayers = int.Parse(
@@ -61,6 +62,17 @@ class ConsoleUi
                 return input;
             Console.WriteLine(errorMessage);
         }
+    }
+
+    public int ReadBet(Player player)
+    {
+        Console.WriteLine($"Saldo: {player.Wallet.Balance}");
+        BetAmount = int.Parse(
+            ReadUntilValid(
+                "Hur många marker vill du satsa?  ",
+                "=== Ange en insättning över 0 och en du har råd med... ===",
+                s => int.TryParse(s, out int n) && player.Wallet.CanAfford(n)));
+        return BetAmount;
     }
 
     /// <summary>Läs in ett drag: köpa eller stanna.</summary>

@@ -82,8 +82,8 @@ public class Game
     /// Returnerar rundan så att loopen kan visa avgörandet för varje
     /// spelare (Settle är ren – samma svar före och efter Play()).
     /// </summary>
-    public Round PlayRound(Func<Player, Card, Move> askPlayer,
-        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
+    public Round PlayRound(Func<Player, Move> askPlayer,
+        Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         // Ny lek vid första rundan; blandas om när korten tar slut
         // (US05: färre än 15 kort kvar → ny blandad lek).
@@ -96,14 +96,7 @@ public class Game
             _deck.ReshuffleIfLow();
         }
 
-        // Spelföljd: mänskliga först i tur och ordning, sedan datorerna.
-        // Round spelar listan i given ordning – den behöver inte veta
-        // skillnaden mellan människa och dator.
-        List<Player> players = _seatedPlayers.Where(p => !p.IsComputer)
-            .Concat(_seatedPlayers.Where(p => p.IsComputer))
-            .ToList();
-
-        Round round = new(_deck, players, askPlayer, showDealer, showBusted);
+        Round round = new(_deck, _seatedPlayers, askPlayer, readBet, showDealer, showBusted);
         round.Play();
         return round;
     }

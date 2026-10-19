@@ -18,16 +18,18 @@ public class Round
     private readonly Func<Player, Card, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
+    private readonly Func<Player, int> _readBet;
     private readonly Dealer _dealer = new();
 
-    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Card, Move> askPlayer,
-        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
+    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
+        Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
         _players = new List<Player>(players);
         _askPlayer = askPlayer;
         _showDealer = showDealer;
         _showBusted = showBusted;
+        _readBet = readBet;
     }
 
     /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
@@ -37,6 +39,14 @@ public class Round
     /// Dela ut: två kort öppet till varje spelare, ett öppet och ett
     /// dolt till givaren.
     /// </summary>
+
+    public void Stake()
+    {
+        foreach (var player in _players)
+        {
+            player.Wallet.Bet(_readBet(player));
+        }
+    }
     public void DealCards()
     {
         foreach (var player in _players)
@@ -96,7 +106,7 @@ public class Round
             return Outcome.Win;
 
         if (_dealer.Hand.IsNatural)
-                        return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
+            return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
 
         int playerValue = player.Hand.GetValue();
         int dealerValue = _dealer.Hand.GetValue();
@@ -111,6 +121,7 @@ public class Round
     /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
     public void Play()
     {
+        Stake();
         DealCards();
         _showDealer?.Invoke(_dealer, false); // öppet kort, hålkortet dolt
         PlayPlayers();
