@@ -159,11 +159,14 @@ class ConsoleUi
     // ---------- US13: datorspelare ----------
 
     /// <summary>Fråga hur många av de valda spelarna som ska vara
-    /// datorspelare. Det måste alltid bli minst en mänsklig spelare,
-    /// så max är antalet valda spelare minus ett.</summary>
-    public int AskComputerCount()
+    /// datorspelare. När det redan sitter en mänsklig spelare vid
+    /// bordet får alla nya spelare vara datorer; annars (första
+    /// tillägget) måste minst en vara människa, så max är antalet
+    /// valda spelare minus ett.</summary>
+    public int AskComputerCount(Game game)
     {
-        int maxComputers = NumbersOfPlayers - 1;
+        bool humanSeated = game.SeatedPlayers.Any(p => !p.IsComputer);
+        int maxComputers = humanSeated ? NumbersOfPlayers : NumbersOfPlayers - 1;
         return int.Parse(ReadUntilValid(
             $"Hur många av dem ska vara datorspelare? (0–{maxComputers}) ",
             $" === ANGE ETT NUMMER MELLAN 0 OCH {maxComputers} ===",
@@ -306,7 +309,9 @@ class ConsoleUi
         Print(freeSeats); // US01: totalt antal spelare, validerat
 
         // US13: direkt efter antalet: hur många av dem ska vara datorer?
-        int computers = AskComputerCount();
+        // Första tillägget kräver minst en människa; senare tillägg får
+        // vara helt datorer eftersom en människa redan sitter vid bordet.
+        int computers = AskComputerCount(game);
         int humans = NumbersOfPlayers - computers;
 
         // US13: datorspelarna – automatiskt namn + vald strategi, direkt ner.
@@ -319,8 +324,8 @@ class ConsoleUi
         }
 
         // US01/US11: sedan de mänskliga – namn, validerat.
-        // humans >= 1 alltid: AskComputerCount släpper bara igenom
-        // max N−1 datorer, så minst en mänsklig spelare frågas alltid.
+        // humans kan vara 0 om en människa redan sitter vid bordet –
+        // då får alla nya spelare vara datorer (AskComputerCount).
         NamesOfPlayers(humans);
         foreach (string name in players)
         {
