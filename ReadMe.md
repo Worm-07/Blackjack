@@ -60,7 +60,7 @@ Avvikelser från specifikationen listas här:
 
 ![Klassdiagram](docs/klassdiagram.png)
 
-Källfilen finns i `docs/klassdiagram.mmd` och uppdateras när koden ändras.
+Källfilen finns i `docs/klassdiagram.md` och uppdateras när koden ändras.
 
 ## User stories
 
