@@ -27,6 +27,7 @@ public class Player : Participant
     // US13: datorspelare med strategi.
     public Player(string name, IPlayerStrategy strategy) : base(name)
     {
+        Wallet = new ChipWallet();
         Strategy = strategy;
     }
 
