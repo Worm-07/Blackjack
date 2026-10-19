@@ -1,6 +1,5 @@
 /*
  ***Tillval 2 (US13): Datorspelare med strategi***
- ***Skelett – implementera TODO:erna i strategiklasserna.***
  */
 
 /// Gemensamt gränssnitt för datorspelares strategier.
@@ -12,5 +11,5 @@ public interface IPlayerStrategy
     /// <summary>
     /// Bestäm nästa drag utifrån spelarens hand och givarens öppna kort.
     /// </summary>
-    Move Decide(Player player, Card dealerUpCard);
+    Move Decide(Hand hand, Card dealerUpCard);
 }

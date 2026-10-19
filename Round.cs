@@ -8,14 +8,14 @@
 /// spelarna gör det.
 ///
 /// Strukturkrav: Round pratar ALDRIG med Console. Spelarens beslut
-/// skickas in som en parameter (Func<Player, Move>) – det kan vara
-/// en spelare som frågas av ConsoleUi (US11), eller en strategi
-/// (US13). Round behöver inte veta skillnaden.
+/// skickas in som en parameter (Func&lt;Player, Card, Move&gt;) – det kan
+/// vara en spelare som frågas av ConsoleUi (US11), eller en
+/// IPlayerStrategy (US13). Round behöver inte veta skillnaden.
 public class Round
 {
     private readonly Deck _deck;
     private readonly List<Player> _players;
-    private readonly Func<Player, Move> _askPlayer;
+    private readonly Func<Player, Card, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
     private readonly Func<Player, int> _readBet;
@@ -67,7 +67,8 @@ public class Round
     {
         foreach (var player in _players)
         {
-            while (!player.IsBusted && _askPlayer(player) == Move.Hit)
+            // DealCards har alltid körts först, så givarens öppna kort finns.
+            while (!player.IsBusted && _askPlayer(player, _dealer.UpCard!) == Move.Hit)
                 player.AddCard(_deck.Deal());
             if (player.IsBusted)
                 _showBusted?.Invoke(player); // visa den spräckta handen
