@@ -101,8 +101,13 @@ public class Game
             _deck.ReshuffleIfLow();
         }
 
-        Round round = new(_deck, _rules, _seatedPlayers, askPlayer, showDealer, showBusted);
-        //round.Play();
+        // Spelföljd: mänskliga först i tur och ordning, sedan datorerna (US13).
+        List<Player> players = _seatedPlayers.Where(p => !p.IsComputer)
+            .Concat(_seatedPlayers.Where(p => p.IsComputer))
+            .ToList();
+
+        Round round = new(_deck, _rules, players, askPlayer, readBet, showDealer, showBusted);
+        round.Play();
        
         return round;
     }

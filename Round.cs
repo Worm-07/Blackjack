@@ -18,15 +18,11 @@ public class Round
     private readonly Func<Player, Card, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
-    private readonly Dealer _dealer;
-    private readonly RuleSet _rules;
-
-    public Round(Deck deck, RuleSet rules, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
-        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     private readonly Func<Player, int> _readBet;
-    private readonly Dealer _dealer = new();
+    private readonly RuleSet _rules;
+    private readonly Dealer _dealer;
 
-    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Card, Move> askPlayer,
+    public Round(Deck deck, RuleSet rules, IReadOnlyList<Player> players, Func<Player, Card, Move> askPlayer,
         Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
@@ -133,11 +129,6 @@ public class Round
                 return Outcome.Push;
             return Outcome.Lose;
         }
-        if (_dealer.Hand.IsNatural)
-            return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
-
-        int playerValue = player.Hand.GetValue();
-        int dealerValue = _dealer.Hand.GetValue();
 
         if (playerValue > dealerValue)
             return Outcome.Win;
@@ -145,7 +136,6 @@ public class Round
             return Outcome.Lose;
         return Outcome.Push;
     }
-}
 
     /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
     public void Play()
