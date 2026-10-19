@@ -9,17 +9,22 @@ public class Game
 {
     private readonly List<Player> _savedPlayers;
     private readonly List<Player> _seatedPlayers = new List<Player>();
+    private readonly RuleSet _rules;
     private readonly Random _random;
 
     // Decken delas över rundorna så att regeln "blanda om vid <15 kort"
     // gäller mellan rundor, inte bara inom en.
     private Deck? _deck;
 
-    public Game(List<Player> savedPlayers, Random random)
+     public Game(List<Player> savedPlayers, Random random, RuleSet rules)
     {
         _savedPlayers = savedPlayers;
         _random = random;
+        _rules = rules;
     }
+
+    // Husreglerna som gäller vid bordet (Tillval 3)
+    public RuleSet Rules => _rules;
 
     // Alla sparade spelare, så att GameStorage kan spara dem
     public IReadOnlyList<Player> SavedPlayers => _savedPlayers;
@@ -89,13 +94,15 @@ public class Game
         // (US05: färre än 15 kort kvar → ny blandad lek).
         if (_deck == null)
         {
-            _deck = new Deck(_random);
+            _deck = new Deck(_random, _rules);
         }
         else
         {
             _deck.ReshuffleIfLow();
         }
 
+        Round round = new(_deck, _rules, _seatedPlayers, askPlayer, showDealer, showBusted);
+        //round.Play();
         Round round = new(_deck, _seatedPlayers, askPlayer, readBet, showDealer, showBusted);
         round.Play();
         return round;

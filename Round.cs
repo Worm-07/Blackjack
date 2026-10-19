@@ -18,6 +18,11 @@ public class Round
     private readonly Func<Player, Card, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
+    private readonly Dealer _dealer;
+    private readonly RuleSet _rules;
+
+    public Round(Deck deck, RuleSet rules, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
+        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     private readonly Func<Player, int> _readBet;
     private readonly Dealer _dealer = new();
 
@@ -25,6 +30,8 @@ public class Round
         Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
+        _rules = rules;
+        _dealer = new Dealer(rules);
         _players = new List<Player>(players);
         _askPlayer = askPlayer;
         _showDealer = showDealer;
@@ -89,9 +96,12 @@ public class Round
     /// <summary>
     /// Avgörande för en spelare (tabellen i specen):
     /// spelare spräckt → Lose
-    /// spelare naturlig 21 och givare inte → Blackjack
+    /// naturlig 21 på båda sidor → Push
+    /// spelare naturlig 21 → Blackjack (eller Push mot givarens 21 av tre kort,
+    ///   om husregeln NaturalBeatsThreeCardTwentyOne är avstängd)
     /// givare spräckt → Win
-    /// givare naturlig 21 → Push
+    /// givare naturlig 21 → Lose (eller Push mot spelarens 21 av tre kort,
+    ///   om husregeln är avstängd)
     /// annars: högre hand vinner; lika → Push
     /// </summary>
     public Outcome Settle(Player player)
@@ -99,12 +109,30 @@ public class Round
         if (player.IsBusted)
             return Outcome.Lose;
 
-        if (player.Hand.IsNatural && !_dealer.Hand.IsNatural)
+        bool playerNatural = player.Hand.IsNatural;
+        bool dealerNatural = _dealer.Hand.IsNatural;
+        int playerValue = player.Hand.GetValue();
+        int dealerValue = _dealer.Hand.GetValue();
+
+        if (playerNatural && dealerNatural)
+            return Outcome.Push;
+
+        if (playerNatural)
+        {
+            if (!_rules.NaturalBeatsThreeCardTwentyOne && dealerValue == 21)
+                return Outcome.Push;
             return Outcome.Blackjack;
+        }
 
         if (_dealer.IsBusted)
             return Outcome.Win;
 
+        if (dealerNatural)
+        {
+            if (!_rules.NaturalBeatsThreeCardTwentyOne && playerValue == 21)
+                return Outcome.Push;
+            return Outcome.Lose;
+        }
         if (_dealer.Hand.IsNatural)
             return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
 
@@ -117,6 +145,7 @@ public class Round
             return Outcome.Lose;
         return Outcome.Push;
     }
+}
 
     /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
     public void Play()
