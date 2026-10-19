@@ -93,22 +93,29 @@ class ConsoleUi
 
     // ---------- US11: visa händar ----------
 
-    /// <summary>Visa en spelares hand: korten + totalt värde.</summary>
+    /// <summary>
+    /// Visa en spelares hand: namn + totalt värde ovanför korten så
+    /// att man alltid ser vems hand det är.
+    /// </summary>
     public void ShowHand(Player player)
     {
-        ShowHand(player.Hand.Cards);
+        Console.WriteLine();
         Console.WriteLine($"{player.Name}: {player.Hand.GetValue()}");
+        ShowHand(player.Hand.Cards);
     }
 
-    /// <summary>Visa givarens hand. Hålkortet visas som ?? tills det vänts.</summary>
+    /// <summary>
+    /// Visa givarens hand med namnet ovanför korten så att man ser
+    /// vems hand det är. Värdet visas först när hålkortet är vänt –
+    /// annars skulle hålkortet "läcka" genom summan.
+    /// </summary>
     public void ShowDealer(Dealer dealer, bool holeRevealed = false)
     {
+        Console.WriteLine();
+        Console.WriteLine(holeRevealed
+            ? $"Givaren: {dealer.Hand.GetValue()}"
+            : "Givaren:");
         ShowHand(dealer.Hand.Cards, hideHoleCard: !holeRevealed);
-
-        // Värdet visas först när hålkortet är vänt – annars skulle
-        // hålkortet "läcka" genom summan.
-        if (holeRevealed)
-            Console.WriteLine($"{dealer.Name}: {dealer.Hand.GetValue()}");
     }
 
     /// <summary>Visa rundans utfall för en spelare.</summary>
