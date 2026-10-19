@@ -1,0 +1,14 @@
+# Husregler för tjugoett
+# Ändra värdena och starta om programmet. Ingen omkompilering behövs.
+
+# Drar givaren på mjuk 17? (ja/nej)
+DealerHitsOnSoftSeventeen=nej
+
+# Antal lekar i spel (1 till 8)
+NumberOfDecks=1
+
+# Blanda om när färre än så här många kort är kvar (minst 5)
+ReshuffleThreshold=15
+
+# Vinner naturlig tjugoett över en 21 av tre kort eller fler? (ja/nej)
+NaturalBeatsThreeCardTwentyOne=ja

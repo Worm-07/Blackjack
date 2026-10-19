@@ -25,10 +25,10 @@ implementera dem. Kom ihåg: kod ni inte kan redogöra för godkänns inte.
 | US10 GameStorage: spara/ladda | `US10-GameStorage` | ✅ genomförd – i dev |
 | US11 Inmatning: validering + visa händar | `US11-Input-validation` | ✅ genomförd – pilstöd + livebord |
 | US12 Tillval 1: Kortgrafik | `US12-Card-graphics` | ✅ genomförd – kort i alla vyer |
-| US13 Tillval 2: Datorspelare med strategi | `US13-Computer-players` | 🚧 skelett |
-| US14 Tillval 3: Husregler från konfigurationsfil | `US14-House-rules` | 🚧 skelett |
-| US15 Tillval 4: Satsningar och marker | `US15-Chips-bets` | 🚧 skelett |
-| US16 Tillval 5: Sko med flera lekar + korträkning | `US16-Shoe-card-counting` | 🚧 skelett |
+| US13 Tillval 2: Datorspelare med strategi | `US13-Computer-players` | ✅ genomförd – antal + strategi i spelarmenyn |
+| US14 Tillval 3: Husregler från konfigurationsfil | `US14-House-rules` | ✅ genomförd – rules.txt |
+| US15 Tillval 4: Satsningar och marker | `US15-Chips-bets` | ✅ genomförd – insats + plånbok |
+| US16 Tillval 5: Sko med flera lekar + korträkning | `US16-Shoe-card-counting` | ❌ skelett borttaget – ej genomförd |
 
 ## ✅ Tidigare problem (nu åtgärdade)
 
@@ -136,25 +136,27 @@ Branch: `US12-Card-graphics` · Beror på: US06 · (se också `feature-card-grap
 ### US13 – Tillval 2: Datorspelare med strategi
 Som spelare vill jag kunna sitta mot datorspelare,
 så att spelet går att testa och spela ensam.
-- [ ] `IPlayerStrategy.Decide(player, dealerUpCard) → Move`
-- [ ] Minst två strategier: enkel (köpa <17) + grundstrategi (tabell)
-- [ ] Dator- och mänskliga spelare kan sitta samtidigt, olika strategier
+- [x] `IPlayerStrategy.Decide(hand, dealerUpCard) → Move`
+- [x] Minst två strategier: enkel (köpa <17) + grundstrategi (tabell)
+- [x] Dator- och mänskliga spelare kan sitta samtidigt, olika strategier
+- [x] Minst en mänsklig spelare krävs (max antal datorer = antal spelare − 1)
+- [x] Mänskliga spelare spelar först i tur och ordning, sedan datorspelarna
 
 Branch: `US13-Computer-players` · Beror på: US06/US07/US08
 
 ### US14 – Tillval 3: Husregler från konfigurationsfil
 Som spelare vill jag kunna byta husregler utan omkompilering.
-- [ ] `RuleSet` läses från fil vid start, injekteras i Dealer/Round/Deck
-- [ ] Mjuk 17, antal lekar, omblandningströskel, naturlig 21 slår 3-korts-21
-- [ ] Saknad fil → standardvärden + meddelande, ingen krasch
+- [x] `RuleSet` läses från fil vid start, injekteras i Dealer/Round/Deck
+- [x] Mjuk 17, antal lekar, omblandningströskel, naturlig 21 slår 3-korts-21
+- [x] Saknad fil → standardvärden + meddelande, ingen krasch
 
 Branch: `US14-House-rules` · Beror på: grunden (US05–US09)
 
 ### US15 – Tillval 4: Satsningar och marker
 Som spelare vill jag kunna satsa marker,
 så att vinst och förlust får konsekvens.
-- [ ] Marker per spelare, satsa innan given (0 < insats ≤ marker)
-- [ ] Vinst 1:1, naturlig 21 3:2, lika → insats tillbaka
+- [x] Marker per spelare, satsa innan given (0 < insats ≤ marker)
+- [x] Vinst 1:1, naturlig 21 3:2, lika → insats tillbaka
 - [ ] Slutar på marker → lämnar bordet; markerna sparas mellan körningar
 - [ ] Överkurs: försäkring (2:1)
 

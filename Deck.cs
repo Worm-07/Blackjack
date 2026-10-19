@@ -9,19 +9,26 @@ public class Deck
 {
     /// US06: färre än 15 kort kvar → ny blandad lek inför nästa runda.
     /// Bytet sker aldrig mitt i en runda.
-    public const int ReshuffleThreshold = 15;
+    /// Tillval 3: antal lekar och ombladningströskel kommer från RuleSet.
 
     private readonly List<Card> _cards = new();
     private readonly Random _random;
+    private readonly int _numberOfDecks;
+
+     /// Färre kort än så här kvar → ny blandad lek inför nästa runda.
+    /// Bytet sker aldrig mitt i en runda.
+    public int ReshuffleThreshold { get; }
 
     /// <summary>
     /// Random delas av hela programmet (skapas en gång i Program.cs).
     /// Skapar man en ny Random vid varje blandning får man samma lek i
     /// on och om igen, eftersom den såddas från klockan.
     /// </summary>
-    public Deck(Random random)
+    public Deck(Random random, RuleSet rules)
     {
         _random = random;
+        _numberOfDecks = rules.NumberOfDecks;
+        ReshuffleThreshold = rules.ReshuffleThreshold;
         BuildDeck();
         Shuffle();
     }
@@ -31,15 +38,18 @@ public class Deck
 
     public bool IsEmpty => _cards.Count == 0;
 
-    /// Bygger en ny lek med 52 kort (4 färger × 13 valörer).
+    /// Bygger en ny lek: 52 kort (4 färger × 13 valörer) per lek i RuleSet.
     private void BuildDeck()
     {
         _cards.Clear();
-        foreach (Suit suit in Enum.GetValues<Suit>())
+        for (int deck = 0; deck < _numberOfDecks; deck++)
         {
-            foreach (Rank rank in Enum.GetValues<Rank>())
+            foreach (Suit suit in Enum.GetValues<Suit>())
             {
-                _cards.Add(new Card(suit, rank));
+                foreach (Rank rank in Enum.GetValues<Rank>())
+                {
+                    _cards.Add(new Card(suit, rank));
+                }
             }
         }
     }
@@ -60,6 +70,7 @@ public class Deck
     /// <summary>Tar bort och returnerar nästa kort i leken.</summary>
     public Card Deal()
     {
+        if (IsEmpty)
                 if (IsEmpty)
         {
             // Leken tog slut mitt i en runda: ta fram en ny, blandad lek.
@@ -74,7 +85,7 @@ public class Deck
 
     /// <summary>
     /// Anropas inför varje ny runda: blandas om om färre än
-    /// ReshuffleThreshold (15) kort är kvar.
+    /// ReshuffleThreshold kort är kvar (värdet kommer från RuleSet).
     /// </summary>
     public void ReshuffleIfLow()
     {

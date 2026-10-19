@@ -8,26 +8,31 @@
 /// spelarna gör det.
 ///
 /// Strukturkrav: Round pratar ALDRIG med Console. Spelarens beslut
-/// skickas in som en parameter (Func<Player, Move>) – det kan vara
-/// en spelare som frågas av ConsoleUi (US11), eller en strategi
-/// (US13). Round behöver inte veta skillnaden.
+/// skickas in som en parameter (Func&lt;Player, Card, Move&gt;) – det kan
+/// vara en spelare som frågas av ConsoleUi (US11), eller en
+/// IPlayerStrategy (US13). Round behöver inte veta skillnaden.
 public class Round
 {
     private readonly Deck _deck;
     private readonly List<Player> _players;
-    private readonly Func<Player, Move> _askPlayer;
+    private readonly Func<Player, Card, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
-    private readonly Dealer _dealer = new();
+    private readonly Func<Player, int> _readBet;
+    private readonly RuleSet _rules;
+    private readonly Dealer _dealer;
 
-    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
-        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
+    public Round(Deck deck, RuleSet rules, IReadOnlyList<Player> players, Func<Player, Card, Move> askPlayer,
+        Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
+        _rules = rules;
+        _dealer = new Dealer(rules);
         _players = new List<Player>(players);
         _askPlayer = askPlayer;
         _showDealer = showDealer;
         _showBusted = showBusted;
+        _readBet = readBet;
     }
 
     /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
@@ -37,6 +42,14 @@ public class Round
     /// Dela ut: två kort öppet till varje spelare, ett öppet och ett
     /// dolt till givaren.
     /// </summary>
+
+    public void Stake()
+    {
+        foreach (var player in _players)
+        {
+            player.Wallet.Bet(_readBet(player));
+        }
+    }
     public void DealCards()
     {
         foreach (var player in _players)
@@ -57,7 +70,8 @@ public class Round
     {
         foreach (var player in _players)
         {
-            while (!player.IsBusted && _askPlayer(player) == Move.Hit)
+            // DealCards har alltid körts först, så givarens öppna kort finns.
+            while (!player.IsBusted && _askPlayer(player, _dealer.UpCard!) == Move.Hit)
                 player.AddCard(_deck.Deal());
             if (player.IsBusted)
                 _showBusted?.Invoke(player); // visa den spräckta handen
@@ -78,9 +92,12 @@ public class Round
     /// <summary>
     /// Avgörande för en spelare (tabellen i specen):
     /// spelare spräckt → Lose
-    /// spelare naturlig 21 och givare inte → Blackjack
+    /// naturlig 21 på båda sidor → Push
+    /// spelare naturlig 21 → Blackjack (eller Push mot givarens 21 av tre kort,
+    ///   om husregeln NaturalBeatsThreeCardTwentyOne är avstängd)
     /// givare spräckt → Win
-    /// givare naturlig 21 → Push
+    /// givare naturlig 21 → Lose (eller Push mot spelarens 21 av tre kort,
+    ///   om husregeln är avstängd)
     /// annars: högre hand vinner; lika → Push
     /// </summary>
     public Outcome Settle(Player player)
@@ -88,17 +105,30 @@ public class Round
         if (player.IsBusted)
             return Outcome.Lose;
 
-        if (player.Hand.IsNatural && !_dealer.Hand.IsNatural)
+        bool playerNatural = player.Hand.IsNatural;
+        bool dealerNatural = _dealer.Hand.IsNatural;
+        int playerValue = player.Hand.GetValue();
+        int dealerValue = _dealer.Hand.GetValue();
+
+        if (playerNatural && dealerNatural)
+            return Outcome.Push;
+
+        if (playerNatural)
+        {
+            if (!_rules.NaturalBeatsThreeCardTwentyOne && dealerValue == 21)
+                return Outcome.Push;
             return Outcome.Blackjack;
+        }
 
         if (_dealer.IsBusted)
             return Outcome.Win;
 
-        if (_dealer.Hand.IsNatural)
-                        return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
-
-        int playerValue = player.Hand.GetValue();
-        int dealerValue = _dealer.Hand.GetValue();
+        if (dealerNatural)
+        {
+            if (!_rules.NaturalBeatsThreeCardTwentyOne && playerValue == 21)
+                return Outcome.Push;
+            return Outcome.Lose;
+        }
 
         if (playerValue > dealerValue)
             return Outcome.Win;
@@ -110,6 +140,7 @@ public class Round
     /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
     public void Play()
     {
+        Stake();
         DealCards();
         _showDealer?.Invoke(_dealer, false); // öppet kort, hålkortet dolt
         PlayPlayers();

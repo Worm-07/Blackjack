@@ -59,7 +59,7 @@ public class Card
         return Rank switch
         {
             Rank.Jack => "Knekt",
-            Rank.Queen => "Dama",
+            Rank.Queen => "Dam",
             Rank.King => "Kung",
             Rank.Ace => "Ess",
             _ => ((int)Rank).ToString() // Om Rank inte matchar någon av de 4 valörer, använda Rank.ToString()

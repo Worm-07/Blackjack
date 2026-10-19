@@ -1,0 +1,194 @@
+---
+config:
+  layout: elk
+---
+classDiagram
+    direction TB
+
+    class Program {
+        <<entry point>>
+    }
+
+    class Game {
+        -List~Player~ _savedPlayers
+        -List~Player~ _seatedPlayers
+        -Random _random
+        -Deck? _deck
+        +SavedPlayers IReadOnlyList~Player~
+        +SeatedPlayers IReadOnlyList~Player~
+        +GetAvailablePlayers() List~Player~
+        +FindOrCreatePlayer(name) Player?
+        +SeatPlayer(player)
+        +CreateAndSeatComputer(name, strategy) Player
+        +PlayRound(askPlayer, showDealer, showBusted) Round
+    }
+
+    class Round {
+        -Deck _deck
+        -List~Player~ _players
+        -Dealer _dealer
+        -Func~Player,Card,Move~ _askPlayer
+        +Players IReadOnlyList~Player~
+        +DealCards()
+        +PlayPlayers()
+        +PlayDealer()
+        +Settle(player) Outcome
+        +Play()
+    }
+
+    class Deck {
+        +ReshuffleThreshold = 15$
+        -List~Card~ _cards
+        -Random _random
+        +RemainingCards int
+        +IsEmpty bool
+        -BuildDeck()
+        +Shuffle()
+        +Deal() Card
+        +ReshuffleIfLow()
+    }
+
+    class Card {
+        +Suit Suit
+        +Rank Rank
+        +ToString() string
+    }
+
+    class Suit {
+        <<enumeration>>
+        Hearts
+        Diamonds
+        Clubs
+        Spades
+    }
+
+    class Rank {
+        <<enumeration>>
+        Two … Ten
+        Jack
+        Queen
+        King
+        Ace
+    }
+
+    class Hand {
+        -List~Card~ _cards
+        +Cards IReadOnlyList~Card~
+        +Count int
+        +AddCard(card)
+        +Clear()
+        +GetValue() int
+        +IsSoft bool
+        +IsBusted bool
+        +IsNatural bool
+    }
+
+    class Participant {
+        +Name string
+        +Hand Hand
+        +AddCard(card)
+        +IsBusted bool
+    }
+
+    class Player {
+        +Wins int
+        +Losses int
+        +Pushes int
+        +Strategy IPlayerStrategy?
+        +IsComputer bool
+        +RecordWin()
+        +RecordLoss()
+        +RecordPush()
+    }
+
+    class Dealer {
+        +UpCard Card?
+        +HoleCard Card?
+        +ShouldHit bool
+    }
+
+    class Move {
+        <<enumeration>>
+        Hit
+        Stand
+    }
+
+    class Outcome {
+        <<enumeration>>
+        Win
+        Lose
+        Push
+        Blackjack
+    }
+
+    class GameStorage {
+        +FileName = "players.txt"$
+        +LoadPlayers() List~Player~
+        +SavePlayers(players)
+    }
+
+    class ConsoleUi {
+        +Print(maxPlayers)
+        +NamesOfPlayers()
+        +ReadUntilValid(prompt, error, isValid) string
+        +ReadMove(player) Move
+        +ShowMenu(game) bool
+        +ShowHand(player)
+        +ShowHand(cards, hideHoleCard)
+        +ShowDealer(dealer, holeRevealed)
+        +ShowResult(player, outcome)
+    }
+
+    class CardRenderer {
+        <<static>>
+        +CardSpacing$
+        +RenderCard(card)$ string[]
+        +RenderFaceDown()$ string[]
+        +RenderCards(cards, hideHoleCard)$ List~string[]~
+        +IsFaceDown(index, hideHoleCard)$ bool
+    }
+
+    class RuleSet {
+        +FileName = "rules.txt"$
+        +DealerHitsOnSoftSeventeen bool
+        +NumberOfDecks int
+        +ReshuffleThreshold int
+        +NaturalBeatsThreeCardTwentyOne bool
+        +LoadFromFile()$ RuleSet
+    }
+
+    class IPlayerStrategy {
+        <<interface>>
+        +Decide(player, dealerUpCard) Move
+    }
+    class BasicStrategy
+    class SimpleStrategy
+
+    Participant <|-- Player
+    Participant <|-- Dealer
+    IPlayerStrategy <|.. BasicStrategy
+    IPlayerStrategy <|.. SimpleStrategy
+    Player ..> IPlayerStrategy : bestämmer draget (US13)
+
+    Participant *-- Hand
+    Hand o-- "0..*" Card
+    Deck *-- "0..52" Card
+    Card --> Suit
+    Card --> Rank
+
+    Game o-- "0..*" Player
+    Game *-- Deck
+    Game ..> Round : skapar
+    Round *-- Dealer
+    Round o-- "1..5" Player
+    Round --> Deck
+    Round ..> Move
+    Round ..> Outcome
+
+    Program ..> Game
+    Program ..> ConsoleUi
+    Program ..> GameStorage
+    GameStorage ..> Player
+    ConsoleUi ..> CardRenderer
+    ConsoleUi ..> Game
+    CardRenderer ..> Card

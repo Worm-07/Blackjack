@@ -6,7 +6,9 @@
  *** Utökat med ett grafiskt konsol-UI:
  ***  • Huvudmeny med piltangentnavigering (↑/↓ + Enter)
  ***  • Highscore-skärm: mest vunnen / mest förlorad + sortering i programmet
- ***  • Reglerskärm som tydligt sammanfattar spelreglerna
+ ***  • Reglerskärm: spelregler + husregler ur rules.txt (Tillval 3)
+ ***  • Datorspelare (US13/US15): antal och strategi vid tillägg,
+ ***    insats och automatiska drag
  ***  • Livebord under rundan: kortgrafiken uppdateras vid varje drag
  ***  • Avgränsare mellan spelarnas turer: varje spelare får ett eget
  ***    avgränsat fält och en färgad TUR-banner när det är deras tur
@@ -157,9 +159,9 @@ class ConsoleUi
     // US03: huvudmeny med piltangentnavigering
     // ================================================================
 
-    /// <summary>Antal spelare som sitter vid bordet (sparade minus tillgängliga).</summary>
+    /// <summary>Antal spelare som sitter vid bordet (inkl. datorspelare, US13).</summary>
     private static int SeatedCount(Game game)
-        => game.SavedPlayers.Count - game.GetAvailablePlayers().Count;
+        => game.SeatedPlayers.Count;
 
     /// <summary>
     /// Huvudmenyn: Starta runda / Highscores / Spelare / Regler / Avsluta.
@@ -257,7 +259,7 @@ class ConsoleUi
                     break;
 
                 case 4:
-                    ShowRules();
+                    ShowRules(game.Rules);
                     break;
 
                 case 5:
@@ -421,17 +423,35 @@ class ConsoleUi
     // ================================================================
 
     /// <summary>
-    /// En skärm som tydligt sammanfattar spelets regler.
+    /// En skärm som tydligt sammanfattar spelets regler: först husreglerna
+    /// ur rules.txt (Tillval 3) med eventuella inläsningsmeddelanden,
+    /// sedan de grundläggande spelreglerna.
     /// Enter (eller en rad i fallback-läget) tillbaka till menyn.
     /// </summary>
-    public void ShowRules()
+    public void ShowRules(RuleSet rules)
     {
         Clear();
         DrawTitle("SPELREGLER");
 
-        // Raderna som inte börjar med blanksteg är rubriker.
-        string[] rules =
+        // Meddelanden från inläsningen av husreglerna, om sådana finns.
+        foreach (string message in rules.Messages)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"   OBS: {message}");
+            Console.ResetColor();
+        }
+
+        // Husreglerna som gäller vid detta bord (Tillval 3, rules.txt)
+        // följt av de grundläggande spelreglerna. Raderna som inte börjar
+        // med blanksteg är rubriker.
+        string[] lines =
         [
+            "HUSREGLER (rules.txt)",
+            $"  Antal lekar: {rules.NumberOfDecks}",
+            $"  Blandas om vid färre än {rules.ReshuffleThreshold} kort",
+            $"  Givaren {(rules.DealerHitsOnSoftSeventeen ? "drar" : "stannar")} på mjuk 17",
+            $"  Naturlig tjugoett {(rules.NaturalBeatsThreeCardTwentyOne ? "slår" : "slår inte")} 21 av tre kort",
+            "",
             "MÅL",
             "  Kom närmare 21 än givaren utan att överstiga 21.",
             "",
@@ -442,7 +462,7 @@ class ConsoleUi
             "",
             "TJUGOETT (BLACKJACK)",
             "  Naturlig 21 (ess + tiokort/klätt på de två första korten)",
-            "  slår en 21 byggd av tre eller fler kort.",
+            $"  {(rules.NaturalBeatsThreeCardTwentyOne ? "slår" : "slår inte")} en 21 byggd av tre eller fler kort.",
             "",
             "DIN TUR",
             "  Köpa (k) = ta ett kort till · Stanna (s) = avsluta din tur.",
@@ -451,18 +471,20 @@ class ConsoleUi
             "GIVAREN",
             "  Väntar tills alla spelare stannat eller spräckt, vänder",
             "  hålkortet och köpar medan värdet är 16 eller lägre.",
-            "  Stannar på 17 eller högre (även mjuk 17).",
+            rules.DealerHitsOnSoftSeventeen
+                ? "  Stannar på hård 17, drar på mjuk 17."
+                : "  Stannar på 17 eller högre (även mjuk 17).",
             "",
             "AVGÖRANDE",
             "  Vinst · Förlust · Lika (push) · Tjugoett.",
             "  Lika räknas varken som vinst eller förlust.",
             "",
             "LEKEN",
-            "  52 kort. Blandas om när färre än 15 kort är kvar.",
+            $"  {rules.NumberOfDecks * 52} kort. Blandas om när färre än {rules.ReshuffleThreshold} kort är kvar.",
             "  1–5 spelare per runda."
         ];
 
-        foreach (string line in rules)
+        foreach (string line in lines)
         {
             if (line.Length == 0)
             {
@@ -493,8 +515,7 @@ class ConsoleUi
         DrawTitle("SPELARE");
 
         List<Player> available = game.GetAvailablePlayers();
-        List<Player> seated = game.SavedPlayers
-            .Where(p => !available.Contains(p)).ToList();
+        List<Player> seated = game.SeatedPlayers.ToList();
 
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("   VID BORDET");
@@ -506,7 +527,7 @@ class ConsoleUi
         else
         {
             foreach (Player p in seated)
-                Console.WriteLine($"     {p.Name}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
+                Console.WriteLine($"     {p.Name}{(p.IsComputer ? " (dator)" : "")}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
         }
 
         Console.WriteLine();
@@ -532,19 +553,51 @@ class ConsoleUi
             AddSeatedPlayers(game);
     }
 
-    /// <summary>Frågar antal (US01) och namn (US01/US11) och sätter
-    /// spelarna ner vid bordet.</summary>
+    /// <summary>
+    /// Frågar antal (US01), direkt efter det hur många av spelarna som är
+    /// datorer (US13), och sedan namn (US01/US11) på de mänskliga.
+    /// Sätter alla ner vid bordet.
+    /// </summary>
     private void AddSeatedPlayers(Game game)
     {
-        Print();          // US01: antal spelare (1–5), validerat
-        NamesOfPlayers(); // US01/US11: namn, validerat
+        // Max 5 spelare vid bordet totalt, inte bara per gång.
+        int freeSeats = 5 - SeatedCount(game);
+        if (freeSeats == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("   === BORDET ÄR FULLT – MAX 5 SPELARE ===");
+            Console.ResetColor();
+            return;
+        }
 
+        Print(freeSeats); // US01: antal nya spelare, validerat
+
+        // US13: direkt efter antalet: hur många av dem ska vara datorer?
+        // Alternativet visas om det redan sitter en mänsklig spelare vid
+        // bordet – då får alla nya spelare vara datorer (en ytterligare
+        // människa behövs inte). Första tillägget kräver minst en
+        // människa; finns inget val att göra returneras 0 direkt.
+        int computers = AskComputerCount(game);
+        int humans = NumbersOfPlayers - computers;
+
+        // US13: datorspelarna – strategi + automatiskt namn, direkt ner.
+        for (int i = 1; i <= computers; i++)
+        {
+            IPlayerStrategy strategy = AskStrategy();
+            string name = UniqueComputerName(game, i);
+            game.CreateAndSeatComputer(name, strategy);
+            Console.WriteLine($"   {name} sitter nu vid bordet (dator).");
+        }
+
+        // US01/US11: sedan de mänskliga – namn, validerat. humans kan vara
+        // 0 om en människa redan sitter vid bordet.
+        NamesOfPlayers(humans);
         foreach (string name in players)
         {
             Player? player = game.FindOrCreatePlayer(name);
             if (player == null)
             {
-                Console.WriteLine($" === {name} SITTER REDAN VID BORDET ===");
+                Console.WriteLine($"   === {name} SITTER REDAN VID BORDET ===");
                 continue;
             }
             game.SeatPlayer(player);
@@ -553,27 +606,80 @@ class ConsoleUi
         players.Clear();
     }
 
-    /// <summary>Frågar antalet spelare (1–5), validerat.</summary>
-    public void Print()
+    /// <summary>Frågar antalet nya spelare (1–maxPlayers), validerat.</summary>
+    public void Print(int maxPlayers = 5)
     {
-        Console.WriteLine("1 - 5 spelare");
+        Console.WriteLine($"   1 - {maxPlayers} spelare");
         NumbersOfPlayers = int.Parse(
             ReadUntilValid(
                 "Välj antalet spelare: ",
-                " === ANGE ETT NUMMER MELLAN 1 OCH 5 ===",
-                s => int.TryParse(s, out int n) && n is >= 1 and <= 5));
+                $" === ANGE ETT NUMMER MELLAN 1 OCH {maxPlayers} ===",
+                s => int.TryParse(s, out int n) && n >= 1 && n <= maxPlayers));
     }
 
-    /// <summary>Frågar namnen på alla spelare, validerade.</summary>
-    public void NamesOfPlayers()
+    /// <summary>Frågar namnen på count spelare, validerade.</summary>
+    public void NamesOfPlayers(int count)
     {
-        for (int i = 0; i < NumbersOfPlayers; i++)
+        for (int i = 0; i < count; i++)
         {
             players.Add(ReadUntilValid(
                 "Ange namn på spelaren: ",
                 " === ANGE ETT NAMN ===",
                 s => !string.IsNullOrWhiteSpace(s)).Trim());
         }
+    }
+
+    // ================================================================
+    // US13: datorspelare – antal, strategi, namn
+    // ================================================================
+
+    /// <summary>
+    /// Frågar hur många av de nya spelarna som ska vara datorspelare.
+    /// Alternativet visas om det redan sitter en mänsklig spelare vid
+    /// bordet – då är 0–antal ett giltigt svar (alla kan vara datorer,
+    /// ingen ytterligare människa behövs). Första tillägget kräver minst
+    /// en människa, så max blir antal minus ett; är max 0 (totalt 1
+    /// spelare) finns inget val att göra och metoden returnerar 0 direkt.
+    /// </summary>
+    public int AskComputerCount(Game game)
+    {
+        bool humanSeated = game.SeatedPlayers.Any(p => !p.IsComputer);
+        int maxComputers = humanSeated ? NumbersOfPlayers : NumbersOfPlayers - 1;
+
+        if (maxComputers <= 0)
+            return 0;
+
+        return int.Parse(ReadUntilValid(
+            $"   Hur många av dem ska vara datorspelare? (0–{maxComputers}) ",
+            $" === ANGE ETT NUMMER MELLAN 0 OCH {maxComputers} ===",
+            s => int.TryParse(s, out int n) && n >= 0 && n <= maxComputers));
+    }
+
+    /// <summary>Frågar vilken strategi datorspelaren ska ha.</summary>
+    public IPlayerStrategy AskStrategy()
+    {
+        Console.WriteLine("   Vilken strategi ska datorspelaren ha?");
+        Console.WriteLine("     1. Enkel (köpa under 17)");
+        Console.WriteLine("     2. Grundstrategi (tabell)");
+
+        string choice = ReadUntilValid(
+            "   Välj strategi: ",
+            " === VÄLJ 1 ELLER 2 ===",
+            s => s is "1" or "2");
+
+        return choice == "1" ? new SimpleStrategy() : new BasicStrategy();
+    }
+
+    /// <summary>Tillverkar ett unikt namn för en datorspelare:
+    /// "Dator 1", "Dator 2", …</summary>
+    private static string UniqueComputerName(Game game, int i)
+    {
+        List<Player> taken = game.SavedPlayers.Concat(game.SeatedPlayers).ToList();
+        int n = i;
+        string name = $"Dator {n}";
+        while (taken.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            name = $"Dator {++n}";
+        return name;
     }
 
     // ---------- US11: validering ----------
@@ -602,6 +708,24 @@ class ConsoleUi
     // ================================================================
     // US08/US11/US12: rundan – livebord, turer och resultat
     // ================================================================
+
+    /// <summary>
+    /// Läser in insatsen (US15). En datorspelare sätter sitt eget spel –
+    /// minsta av 10 eller saldot – och frågas aldrig.
+    /// </summary>
+    public int ReadBet(Player player)
+    {
+        if (player.IsComputer)
+            return Math.Min(10, player.Wallet.Balance);
+
+        Console.WriteLine($"   Saldo: {player.Wallet.Balance}");
+        int bet = int.Parse(
+            ReadUntilValid(
+                "   Hur många marker vill du satsa?  ",
+                "   === Ange en insats över 0 som du har råd med... ===",
+                s => int.TryParse(s, out int n) && player.Wallet.CanAfford(n)));
+        return bet;
+    }
 
     /// <summary>
     /// Spelarens tur: ritar livebordet med en gul TUR-banner
@@ -637,6 +761,20 @@ class ConsoleUi
             s => s.Length == 1 && (s[0] is 'k' or 'K' or 's' or 'S'))
             .StartsWith("k", StringComparison.OrdinalIgnoreCase)
             ? Move.Hit : Move.Stand;
+    }
+
+    /// <summary>
+    /// US13: visar en datorspelares beslut – livebordet ritas om med
+    /// datorn markerad och beslutet (köper/stannar) skrivs under bordet.
+    /// </summary>
+    public void ShowComputerMove(Player player, Move move)
+    {
+        DrawBoard(_game!, activePlayer: player,
+            banner: $"{player.Name.ToUpperInvariant()} (DATOR)");
+
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine($"   {player.Name} (dator): {(move == Move.Hit ? "köper" : "stannar")}");
+        Console.ResetColor();
     }
 
     /// <summary>
