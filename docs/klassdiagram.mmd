@@ -94,11 +94,13 @@ classDiagram
         +Wins int
         +Losses int
         +Pushes int
+        +MaxChipsDuringGame int
         +Strategy IPlayerStrategy?
         +IsComputer bool
         +RecordWin()
         +RecordLoss()
         +RecordPush()
+        +UpdateChipsPeak()
     }
 
     class Dealer {

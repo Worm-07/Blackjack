@@ -11,12 +11,12 @@ Random random = new();
 List<Player> players = new GameStorage().LoadPlayers();
 
 // Tillval 3: Läs husreglerna från rules.txt. Saknas filen används
-// standardvärden. ConsoleUi visar reglerna och eventuella meddelanden.
+// standardvärden. Reglerna (tillsammans med eventuella
+// inläsningsmeddelanden) visas under menyposten Regler.
 RuleSet rules = RuleSet.LoadFromFile();
 
 Game game = new(players, random, rules);
 ConsoleUi ui = new();
-ui.ShowRules(rules);
 
 // Spelloopen: meny (US03) → runda (US08) → spara (US10).
 while (true)

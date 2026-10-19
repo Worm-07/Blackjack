@@ -27,7 +27,7 @@ implementera dem. Kom ihåg: kod ni inte kan redogöra för godkänns inte.
 | US12 Tillval 1: Kortgrafik | `US12-Card-graphics` | ✅ genomförd – kort i alla vyer |
 | US13 Tillval 2: Datorspelare med strategi | `US13-Computer-players` | ✅ genomförd – antal + strategi i spelarmenyn |
 | US14 Tillval 3: Husregler från konfigurationsfil | `US14-House-rules` | ✅ genomförd – rules.txt |
-| US15 Tillval 4: Satsningar och marker | `US15-Chips-bets` | ✅ genomförd – insats + plånbok |
+| US15 Tillval 4: Satsningar och marker | `US15-Chips-bets` | ✅ genomförd – insats, plånbok, konkurs + statistik |
 | US16 Tillval 5: Sko med flera lekar + korträkning | `US16-Shoe-card-counting` | ❌ skelett borttaget – ej genomförd |
 
 ## ✅ Tidigare problem (nu åtgärdade)
@@ -129,6 +129,7 @@ så att spelet blir tydligt och roligare.
 - [x] Renderaren returnerar `string[]` (rader) – ConsoleUi sätter färgen
 - [x] Korten i en hand står bredvid varandra
 - [x] Hålkortet ritas med baksidan upp (schackglyfer för klädda kort)
+- [x] Livebordet ritas som en grön blackjack-matta: guldplåt "BLACKJACK", givaren överst, spelarna sida vid sida i sina säten med namn + värde överst, kort i mitten och insatsen (som text + färgade chips) under korten (ChipRenderer, samma form/färg-uppdelning som korten). Mattans bredd anpassas efter antalet spelare (1–5) och konsolruttens bredd, så att alla säten ryms i en enda rad och brädet aldrig viker om
 - [x] Inga ändringar krävs i regelklasserna (annars: läckage, skriv i rapporten)
 
 Branch: `US12-Card-graphics` · Beror på: US06 · (se också `feature-card-graphics` med skiss)
@@ -141,6 +142,7 @@ så att spelet går att testa och spela ensam.
 - [x] Dator- och mänskliga spelare kan sitta samtidigt, olika strategier
 - [x] Minst en mänsklig spelare krävs (max antal datorer = antal spelare − 1)
 - [x] Mänskliga spelare spelar först i tur och ordning, sedan datorspelarna
+- [x] Datorn satsar slumpmässigt (5–hela saldot), aldrig en fast summa
 
 Branch: `US13-Computer-players` · Beror på: US06/US07/US08
 
@@ -157,7 +159,8 @@ Som spelare vill jag kunna satsa marker,
 så att vinst och förlust får konsekvens.
 - [x] Marker per spelare, satsa innan given (0 < insats ≤ marker)
 - [x] Vinst 1:1, naturlig 21 3:2, lika → insats tillbaka
-- [ ] Slutar på marker → lämnar bordet; markerna sparas mellan körningar
+- [x] Slutar på marker → lämnar bordet; markerna sparas mellan körningar
+- [x] Highscores visar mest antal marker spelaren haft under spelet (kolumn "Mest antal marker under spel")
 - [ ] Överkurs: försäkring (2:1)
 
 Branch: `US15-Chips-bets` · Beror på: grunden + US10
