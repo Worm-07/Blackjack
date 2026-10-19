@@ -9,8 +9,19 @@ Klasser och metoder på engelska, allt användaren ser på svenska.
 dotnet run --project Blackjack.csproj
 ```
 
-OBS: `Program.cs` ingår i `US09-Game-loop` – projektet bygger inte förrän
-den branchen är mergad till dev.
+## Styrning
+
+| Skärm | Kontroller |
+|---|---|
+| Huvudmeny | `↑`/`↓` (eller `1`–`5`) markera, `Enter` välja, `Esc` avsluta |
+| Spelare | `j` lägg till, `1` starta runda, `Enter`/`Esc` tillbaka |
+| Highscores | `1` flest vinstar, `2` flest förluster, `3` namn A–Ö, `Enter`/`Esc` tillbaka |
+| Regler | `Enter`/`Esc` tillbaka |
+| Runda | `k` köpa, `s` stanna (även piltangenterna: `→` köpa, `←` stanna) |
+
+I en interaktiv konsol färgsätts den valda menyposten och den aktiva
+spelaren. Korten ritas som kort (US12): valör i hörnen, färg i mitten,
+givarens hålkort dolt (baksidan upp) tills det vänts.
 
 ## Översikt över klasserna
 
@@ -27,7 +38,8 @@ den branchen är mergad till dev.
 | Game | Meny och spelloop | US02/US03/US09 |
 | Move, Outcome | Enum:ar – drag och utfall | US07 |
 | GameStorage | Spara/ladda spelare + resultat | US10 |
-| ConsoleUi | All in- och utmatning | US11 |
+| ConsoleUi | All in- och utmatning: meny, highscores, regler, livebord | US11 |
+| CardRenderer | Kortgrafik: kort som rader med box-drag | US12 |
 
 ## Vem har gjort vad
 
@@ -44,8 +56,9 @@ Avvikelser från specifikationen listas här:
 
 ## Kända brister
 
-- `Program.cs` saknas tills US09 mergas.
-- `US03-Menu` och `feature-card-graphics` behöver rebase mot dev.
+- Inga kända funktionella brister.
+- Den lokala `dev` ligger efter `origin/dev` (tillval US13–US16 är mergade
+  på origin men ej tagna in i den lokala grenen).
 
 ## Klassdiagram
 

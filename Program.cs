@@ -1,6 +1,5 @@
 /*
  ***US09: Program.cs – entry point***
- ***Skelett – se TODO:erna.***
  */
 
 // En Random delas av HELA programmet. Skapas den på nytt i Deck
@@ -21,13 +20,14 @@ while (true)
     {
         // US08: en runda. US11: spelarens beslut (köpa/stanna) levereras
         // till Round som Func<Player, Move> – Round pratar aldrig med Console.
-        // Givarens hand visas via ShowDealer (hålkortet dolt tills det vänts)
-        // och en spräckt spelare ser sin hand via ShowHand.
+        // Gränssnittet ritar livebordet med kortgrafik (US12) via ShowDealer
+        // (hålkortet dolt tills det vänts) och markerar spräckt spelare via
+        // ShowHand – så korten syns under rundans gång.
         Round round = game.PlayRound(ui.ReadMove, ui.ShowDealer, ui.ShowHand);
 
-        // US09: visa resultatet för varje spelare (Round visar själv aldrig).
-        foreach (Player p in round.Players)
-            ui.ShowResult(p, round.Settle(p));
+        // US09: visa resultatet: sista vyn med alla händar öppna och
+        // avgörandet för varje spelare (Round visar själv aldrig).
+        ui.ShowRoundEnd(round);
 
         new GameStorage().SavePlayers(game.SavedPlayers); // US10
     }
