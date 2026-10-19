@@ -103,8 +103,7 @@ public class Game
 
         Round round = new(_deck, _rules, _seatedPlayers, askPlayer, showDealer, showBusted);
         //round.Play();
-        Round round = new(_deck, _seatedPlayers, askPlayer, readBet, showDealer, showBusted);
-        round.Play();
+       
         return round;
     }
 }
