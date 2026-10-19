@@ -247,8 +247,8 @@ class ConsoleUi
         }
 
         string add = ReadUntilValid(
-            "Vill du lägga till spelare? (j/nej) ",
-            " === J ELLER NEJ ===",
+            "Vill du lägga till spelare? (j/n) ",
+            " === J ELLER N ===",
             s => s.Length == 1 && (s[0] is 'j' or 'J' or 'n' or 'N'));
 
         if (add.StartsWith("j", StringComparison.OrdinalIgnoreCase))
