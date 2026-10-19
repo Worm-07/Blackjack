@@ -19,6 +19,7 @@ classDiagram
         +GetAvailablePlayers() List~Player~
         +FindOrCreatePlayer(name) Player?
         +SeatPlayer(player)
+        +CreateAndSeatComputer(name, strategy) Player
         +PlayRound(askPlayer, showDealer, showBusted) Round
     }
 
@@ -26,7 +27,7 @@ classDiagram
         -Deck _deck
         -List~Player~ _players
         -Dealer _dealer
-        -Func~Player,Move~ _askPlayer
+        -Func~Player,Card,Move~ _askPlayer
         +Players IReadOnlyList~Player~
         +DealCards()
         +PlayPlayers()
@@ -93,6 +94,8 @@ classDiagram
         +Wins int
         +Losses int
         +Pushes int
+        +Strategy IPlayerStrategy?
+        +IsComputer bool
         +RecordWin()
         +RecordLoss()
         +RecordPush()
@@ -165,6 +168,7 @@ classDiagram
     Participant <|-- Dealer
     IPlayerStrategy <|.. BasicStrategy
     IPlayerStrategy <|.. SimpleStrategy
+    Player ..> IPlayerStrategy : bestämmer draget (US13)
 
     Participant *-- Hand
     Hand o-- "0..*" Card

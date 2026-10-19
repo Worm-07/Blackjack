@@ -10,9 +10,22 @@ public class Player : Participant
     public int Losses { get; private set; }
     public int Pushes { get; private set; }
 
+    // US13: null för människa, en strategi för datorspelare.
+    // Strategin bestämmer draget – Player bestämmer aldrig själv.
+    public IPlayerStrategy? Strategy { get; }
+
+    /// <summary>True om spelaren är en datorspelare (US13).</summary>
+    public bool IsComputer => Strategy != null;
+
     // Ny spelare utan tidigare resultat.
     public Player(string name) : base(name)
     {
+    }
+
+    // US13: datorspelare med strategi.
+    public Player(string name, IPlayerStrategy strategy) : base(name)
+    {
+        Strategy = strategy;
     }
 
     // Används av GameStorage (US10) när resultat läses in ur filen.
