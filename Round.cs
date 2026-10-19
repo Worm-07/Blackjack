@@ -132,13 +132,18 @@ public class Round
             switch (Settle(player))
             {
                 case Outcome.Win:
+                    player.Wallet.CollectWin();
+                    break;
                 case Outcome.Blackjack:
+                    player.Wallet.CollectBlackjack();
                     player.RecordWin();
                     break;
                 case Outcome.Lose:
+                    player.Wallet.CollectLoss();
                     player.RecordLoss();
                     break;
                 case Outcome.Push:
+                    player.Wallet.ReturnBet();
                     player.RecordPush();
                     break;
             }
