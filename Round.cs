@@ -21,7 +21,7 @@ public class Round
     private readonly Func<Player, int> _readBet;
     private readonly Dealer _dealer = new();
 
-    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
+    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Card, Move> askPlayer,
         Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
