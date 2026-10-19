@@ -66,6 +66,10 @@ class ConsoleUi
 
     public int ReadBet(Player player)
     {
+        // US13: en datorspelare sätter sitt eget spel – den frågas inte.
+        if (player.IsComputer)
+            return Math.Min(10, player.Wallet.Balance);
+
         Console.WriteLine($"Saldo: {player.Wallet.Balance}");
         BetAmount = int.Parse(
             ReadUntilValid(

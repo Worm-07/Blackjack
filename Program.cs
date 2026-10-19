@@ -25,10 +25,23 @@ while (true)
     if (ui.ShowMenu(game))
     {
         // US08: en runda. US11: spelarens beslut (köpa/stanna) levereras
-        // till Round som Func<Player, Move> – Round pratar aldrig med Console.
-        // Givarens hand visas via ShowDealer (hålkortet dolt tills det vänts)
-        // och en spräckt spelare ser sin hand via ShowHand.
-        Round round = game.PlayRound((player, _) => ui.ReadMove(player), ui.ReadBet, ui.ShowDealer, ui.ShowHand);
+        // till Round som Func<Player, Card, Move> – Round pratar aldrig
+        // med Console. Givarens hand visas via ShowDealer (hålkortet dolt
+        // tills det vänts) och en spräckt spelare ser sin hand via ShowHand.
+        // US13: mänskliga spelare frågas av ConsoleUi, datorspelare avgörs
+        // av sin IPlayerStrategy – Round behöver inte veta skillnaden.
+        Round round = game.PlayRound(
+            (player, upCard) =>
+            {
+                if (player.Strategy is { } strategy)
+                {
+                    Move move = strategy.Decide(player.Hand, upCard);
+                    ui.ShowComputerMove(player, move);
+                    return move;
+                }
+                return ui.ReadMove(player);
+            },
+            ui.ReadBet, ui.ShowDealer, ui.ShowHand);
 
         // US09: visa resultatet för varje spelare (Round visar själv aldrig).
         foreach (Player p in round.Players)
