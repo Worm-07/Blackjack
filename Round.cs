@@ -8,14 +8,14 @@
 /// spelarna gör det.
 ///
 /// Strukturkrav: Round pratar ALDRIG med Console. Spelarens beslut
-/// skickas in som en parameter (Func<Player, Move>) – det kan vara
-/// en spelare som frågas av ConsoleUi (US11), eller en strategi
-/// (US13). Round behöver inte veta skillnaden.
+/// skickas in som en parameter (Func&lt;Player, Card, Move&gt;) – det kan
+/// vara en spelare som frågas av ConsoleUi (US11), eller en
+/// IPlayerStrategy (US13). Round behöver inte veta skillnaden.
 public class Round
 {
     private readonly Deck _deck;
     private readonly List<Player> _players;
-    private readonly Func<Player, Move> _askPlayer;
+    private readonly Func<Player, Card, Move> _askPlayer;
     private readonly Action<Dealer, bool>? _showDealer;
     private readonly Action<Player>? _showBusted;
     private readonly Dealer _dealer;
@@ -23,6 +23,11 @@ public class Round
 
     public Round(Deck deck, RuleSet rules, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
         Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
+    private readonly Func<Player, int> _readBet;
+    private readonly Dealer _dealer = new();
+
+    public Round(Deck deck, IReadOnlyList<Player> players, Func<Player, Move> askPlayer,
+        Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         _deck = deck;
         _rules = rules;
@@ -31,6 +36,7 @@ public class Round
         _askPlayer = askPlayer;
         _showDealer = showDealer;
         _showBusted = showBusted;
+        _readBet = readBet;
     }
 
     /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
@@ -40,6 +46,14 @@ public class Round
     /// Dela ut: två kort öppet till varje spelare, ett öppet och ett
     /// dolt till givaren.
     /// </summary>
+
+    public void Stake()
+    {
+        foreach (var player in _players)
+        {
+            player.Wallet.Bet(_readBet(player));
+        }
+    }
     public void DealCards()
     {
         foreach (var player in _players)
@@ -60,7 +74,8 @@ public class Round
     {
         foreach (var player in _players)
         {
-            while (!player.IsBusted && _askPlayer(player) == Move.Hit)
+            // DealCards har alltid körts först, så givarens öppna kort finns.
+            while (!player.IsBusted && _askPlayer(player, _dealer.UpCard!) == Move.Hit)
                 player.AddCard(_deck.Deal());
             if (player.IsBusted)
                 _showBusted?.Invoke(player); // visa den spräckta handen
@@ -118,11 +133,44 @@ public class Round
                 return Outcome.Push;
             return Outcome.Lose;
         }
+        if (_dealer.Hand.IsNatural)
+            return player.Hand.IsNatural ? Outcome.Push : Outcome.Lose;
+
+        int playerValue = player.Hand.GetValue();
+        int dealerValue = _dealer.Hand.GetValue();
 
         if (playerValue > dealerValue)
             return Outcome.Win;
         if (playerValue < dealerValue)
             return Outcome.Lose;
         return Outcome.Push;
+    }
+}
+
+    /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
+    public void Play()
+    {
+        Stake();
+        DealCards();
+        _showDealer?.Invoke(_dealer, false); // öppet kort, hålkortet dolt
+        PlayPlayers();
+        PlayDealer();
+
+        foreach (var player in _players)
+        {
+            switch (Settle(player))
+            {
+                case Outcome.Win:
+                case Outcome.Blackjack:
+                    player.RecordWin();
+                    break;
+                case Outcome.Lose:
+                    player.RecordLoss();
+                    break;
+                case Outcome.Push:
+                    player.RecordPush();
+                    break;
+            }
+        }
     }
 }

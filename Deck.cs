@@ -71,6 +71,7 @@ public class Deck
     public Card Deal()
     {
         if (IsEmpty)
+                if (IsEmpty)
         {
             // Leken tog slut mitt i en runda: ta fram en ny, blandad lek.
             BuildDeck();

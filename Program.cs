@@ -28,7 +28,7 @@ while (true)
         // till Round som Func<Player, Move> – Round pratar aldrig med Console.
         // Givarens hand visas via ShowDealer (hålkortet dolt tills det vänts)
         // och en spräckt spelare ser sin hand via ShowHand.
-        Round round = game.PlayRound(ui.ReadMove, ui.ShowDealer, ui.ShowHand);
+        Round round = game.PlayRound(ui.ReadMove, ui.ReadBet, ui.ShowDealer, ui.ShowHand);
 
         // US09: visa resultatet för varje spelare (Round visar själv aldrig).
         foreach (Player p in round.Players)

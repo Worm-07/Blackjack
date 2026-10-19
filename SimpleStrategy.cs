@@ -5,10 +5,9 @@
 /// Enkel strategi: köpa så länge handens värde är under 17, annars stanna.
 public class SimpleStrategy : IPlayerStrategy
 {
-    public Move Decide(Player player, Card dealerUpCard)
+    public Move Decide(Hand hand, Card dealerUpCard)
     {
-        // TODO Tillval 2 (kräver US06/US07: Player.Hand):
-        // return player.Hand.GetValue() < 17 ? Move.Hit : Move.Stand;
-        throw new NotImplementedException();
+        // Köpa så länge handens värde är under 17, annars stanna.
+        return hand.GetValue() < 17 ? Move.Hit : Move.Stand;
     }
 }

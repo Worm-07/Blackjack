@@ -16,22 +16,23 @@ class ConsoleUi
 {
     public List<string> players = [];
     public int NumbersOfPlayers;
+    public int BetAmount;
 
     // ---------- US01: antal och namn på spelare ----------
 
-    public void Print()
+    public void Print(int maxPlayers = 5)
     {
-        Console.WriteLine("1 - 5 spelare");
+        Console.WriteLine($"1 - {maxPlayers} spelare");
         NumbersOfPlayers = int.Parse(
             ReadUntilValid(
                 "Välj antalet spelare: ",
-                " === ANGE ETT NUMMER MELLAN 1 OCH 5 ===",
-                s => int.TryParse(s, out int n) && n is >= 1 and <= 5));
+                $" === ANGE ETT NUMMER MELLAN 1 OCH {maxPlayers} ===",
+                s => int.TryParse(s, out int n) && n >= 1 && n <= maxPlayers));
     }
 
-    public void NamesOfPlayers()
+    public void NamesOfPlayers(int count)
     {
-        for (int i = 0; i < NumbersOfPlayers; i++)
+        for (int i = 0; i < count; i++)
         {
             players.Add(ReadUntilValid(
                 "Ange namn på spelaren: ",
@@ -61,6 +62,17 @@ class ConsoleUi
                 return input;
             Console.WriteLine(errorMessage);
         }
+    }
+
+    public int ReadBet(Player player)
+    {
+        Console.WriteLine($"Saldo: {player.Wallet.Balance}");
+        BetAmount = int.Parse(
+            ReadUntilValid(
+                "Hur många marker vill du satsa?  ",
+                "=== Ange en insättning över 0 och en du har råd med... ===",
+                s => int.TryParse(s, out int n) && player.Wallet.CanAfford(n)));
+        return BetAmount;
     }
 
     /// <summary>Läs in ett drag: köpa eller stanna.</summary>
@@ -133,11 +145,58 @@ class ConsoleUi
     }
 
   
+    // ---------- US13: datorspelare ----------
+
+    /// <summary>Fråga hur många av de valda spelarna som ska vara
+    /// datorspelare. Det måste alltid bli minst en mänsklig spelare,
+    /// så max är antalet valda spelare minus ett.</summary>
+    public int AskComputerCount()
+    {
+        int maxComputers = NumbersOfPlayers - 1;
+        return int.Parse(ReadUntilValid(
+            $"Hur många av dem ska vara datorspelare? (0–{maxComputers}) ",
+            $" === ANGE ETT NUMMER MELLAN 0 OCH {maxComputers} ===",
+            s => int.TryParse(s, out int n) && n >= 0 && n <= maxComputers));
+    }
+
+    /// <summary>Fråga vilken strategi datorspelaren ska ha.</summary>
+    public IPlayerStrategy AskStrategy()
+    {
+        Console.WriteLine("Vilken strategi ska datorspelaren ha?");
+        Console.WriteLine("  1. Enkel (köpa under 17)");
+        Console.WriteLine("  2. Grundstrategi (tabell)");
+
+        string choice = ReadUntilValid(
+            "Välj strategi: ",
+            " === VÄLJ 1 ELLER 2 ===",
+            s => s is "1" or "2");
+
+        return choice == "1" ? new SimpleStrategy() : new BasicStrategy();
+    }
+
+    /// <summary>Visa vad en datorspelare gör så att man kan följa rundan.</summary>
+    public void ShowComputerMove(Player player, Move move)
+    {
+        Console.WriteLine($"{player.Name} (dator): {(move == Move.Hit ? "köper" : "stannar")}");
+    }
+
+    /// <summary>Tillverkar ett unikt namn för en datorspelare:
+    /// "Dator 1", "Dator 2", …</summary>
+    private static string UniqueComputerName(Game game, int i)
+    {
+        List<Player> taken = game.SavedPlayers.Concat(game.SeatedPlayers).ToList();
+        int n = i;
+        string name = $"Dator {n}";
+        while (taken.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            name = $"Dator {++n}";
+        return name;
+    }
+
     // ---------- US03: huvudmeny ----------
 
-    /// <summary>Antal spelare som sitter vid bordet (sparade minus tillgängliga).</summary>
+    /// <summary>Antal spelare som sitter vid bordet (inkl. datorspelare, US13).</summary>
     private static int SeatedCount(Game game)
-        => game.SavedPlayers.Count - game.GetAvailablePlayers().Count;
+        => game.SeatedPlayers.Count;
 
     /// <summary>
     /// Huvudmenyn: spela runda / spelare (visa, lägga till) / avsluta.
@@ -185,8 +244,7 @@ class ConsoleUi
     private void ShowPlayers(Game game)
     {
         List<Player> available = game.GetAvailablePlayers();
-        List<Player> seated = game.SavedPlayers
-            .Where(p => !available.Contains(p)).ToList();
+        List<Player> seated = game.SeatedPlayers.ToList();
 
         Console.WriteLine();
         Console.WriteLine("Spelare vid bordet:");
@@ -197,7 +255,7 @@ class ConsoleUi
         else
         {
             foreach (Player p in seated)
-                Console.WriteLine($"  {p.Name}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
+                Console.WriteLine($"  {p.Name}{(p.IsComputer ? " (dator)" : "")}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
         }
 
         Console.WriteLine();
@@ -221,13 +279,38 @@ class ConsoleUi
             AddSeatedPlayers(game);
     }
 
-    /// <summary>Frågar antal (US01) och namn (US01/US11) och sätter
-    /// spelarna ner vid bordet.</summary>
+    /// <summary>Frågar antal (US01), direkt efter det hur många av
+    /// spelarna som är datorer (US13), och sedan namn (US01/US11) på
+    /// de mänskliga. Sätter alla ner vid bordet.</summary>
     private void AddSeatedPlayers(Game game)
     {
-        Print();          // US01: antal spelare (1–5), validerat
-        NamesOfPlayers(); // US01/US11: namn, validerat
+        // Max 5 spelare vid bordet totalt, inte bara per gång.
+        int freeSeats = 5 - SeatedCount(game);
+        if (freeSeats == 0)
+        {
+            Console.WriteLine(" === BORDET ÄR FULLT – MAX 5 SPELARE ===");
+            return;
+        }
 
+        Print(freeSeats); // US01: totalt antal spelare, validerat
+
+        // US13: direkt efter antalet: hur många av dem ska vara datorer?
+        int computers = AskComputerCount();
+        int humans = NumbersOfPlayers - computers;
+
+        // US13: datorspelarna – automatiskt namn + vald strategi, direkt ner.
+        for (int i = 1; i <= computers; i++)
+        {
+            IPlayerStrategy strategy = AskStrategy();
+            string name = UniqueComputerName(game, i);
+            game.CreateAndSeatComputer(name, strategy);
+            Console.WriteLine($" {name} sitter nu vid bordet (dator).");
+        }
+
+        // US01/US11: sedan de mänskliga – namn, validerat.
+        // humans >= 1 alltid: AskComputerCount släpper bara igenom
+        // max N−1 datorer, så minst en mänsklig spelare frågas alltid.
+        NamesOfPlayers(humans);
         foreach (string name in players)
         {
             Player? player = game.FindOrCreatePlayer(name);

@@ -25,7 +25,7 @@ implementera dem. Kom ihåg: kod ni inte kan redogöra för godkänns inte.
 | US10 GameStorage: spara/ladda | `US10-GameStorage` | 🚧 skelett |
 | US11 Inmatning: validering + visa händar | `US11-Input-validation` | 🚧 skelett |
 | US12 Tillval 1: Kortgrafik | `US12-Card-graphics` | 🚧 skelett |
-| US13 Tillval 2: Datorspelare med strategi | `US13-Computer-players` | 🚧 skelett |
+| US13 Tillval 2: Datorspelare med strategi | `US13-Computer-players` | ✅ klar |
 | US14 Tillval 3: Husregler från konfigurationsfil | `US14-House-rules` | 🚧 skelett |
 | US15 Tillval 4: Satsningar och marker | `US15-Chips-bets` | 🚧 skelett |
 | US16 Tillval 5: Sko med flera lekar + korträkning | `US16-Shoe-card-counting` | 🚧 skelett |
@@ -139,9 +139,11 @@ Branch: `US12-Card-graphics` · Beror på: US06 · (se också `feature-card-grap
 ### US13 – Tillval 2: Datorspelare med strategi
 Som spelare vill jag kunna sitta mot datorspelare,
 så att spelet går att testa och spela ensam.
-- [ ] `IPlayerStrategy.Decide(player, dealerUpCard) → Move`
-- [ ] Minst två strategier: enkel (köpa <17) + grundstrategi (tabell)
-- [ ] Dator- och mänskliga spelare kan sitta samtidigt, olika strategier
+- [x] `IPlayerStrategy.Decide(hand, dealerUpCard) → Move`
+- [x] Minst två strategier: enkel (köpa <17) + grundstrategi (tabell)
+- [x] Dator- och mänskliga spelare kan sitta samtidigt, olika strategier
+- [x] Minst en mänsklig spelare krävs (max antal datorer = antal spelare − 1)
+- [x] Mänskliga spelare spelar först i tur och ordning, sedan datorspelarna
 
 Branch: `US13-Computer-players` · Beror på: US06/US07/US08
 

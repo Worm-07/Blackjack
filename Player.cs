@@ -1,34 +1,44 @@
 /*
  ***US10: Player – ärver Participant***
- ***US16 (Tillval 5): Player med korträkning***
  */
 
 /// En spelare som sitter vid bordet. Ärver namn och hand från
-/// Participant (US10) och har sin egen statistik och sin egen korträknare.
-/// Räknaren är en ren observatör – den påverkar aldrig spelet.
+/// Participant (US10) och har sin egen statistik.
 public class Player : Participant
 {
     public int Wins { get; private set; }
     public int Losses { get; private set; }
     public int Pushes { get; private set; }
+    public ChipWallet Wallet { get; }
 
-    /// <summary>Korträknaren (Tillval 5).</summary>
-    public HiLoCounter Counter { get; }
+    // US13: null för människa, en strategi för datorspelare.
+    // Strategin bestämmer draget – Player bestämmer aldrig själv.
+    public IPlayerStrategy? Strategy { get; }
 
-    public Player(string name, int decksInShoe = 1) : base(name)
+    /// <summary>True om spelaren är en datorspelare (US13).</summary>
+    public bool IsComputer => Strategy != null;
+
+    // Ny spelare utan tidigare resultat.
+    public Player(string name) : base(name)
     {
-        Counter = new HiLoCounter(decksInShoe);
+        Wallet = new ChipWallet();
+    }
+
+    // US13: datorspelare med strategi.
+    public Player(string name, IPlayerStrategy strategy) : base(name)
+    {
+        Strategy = strategy;
     }
 
     // Används av GameStorage (US10) när resultat läses in ur filen.
-    public Player(string name, int wins, int losses, int pushes,
-        int decksInShoe = 1) : base(name)
+    public Player(string name, int wins, int losses, int pushes, int wallet) : base(name)
     {
         Wins = wins;
         Losses = losses;
         Pushes = pushes;
-        Counter = new HiLoCounter(decksInShoe);
+        Wallet = new ChipWallet(wallet);
     }
+
 
     /// <summary>Räkna en vunnen runda.</summary>
     public void RecordWin() => Wins++;
@@ -38,14 +48,4 @@ public class Player : Participant
 
     /// <summary>Räkna en lika runda (räknas varken som vinst eller förlust).</summary>
     public void RecordPush() => Pushes++;
-
-    /// <summary>
-    /// Tillval 5: anropas när ett kort blir synligt (Round/Game kallar
-    /// detta). Kortet räknas men ändrar aldrig spelet.
-    /// </summary>
-    public void CardSeen(Card card)
-    {
-        // TODO Tillval 5: Counter.CardSeen(card);
-        throw new NotImplementedException();
-    }
 }
