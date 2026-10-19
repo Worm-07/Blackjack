@@ -68,7 +68,7 @@ public class Game
     /// spelare (Settle är ren – samma svar före och efter Play()).
     /// </summary>
     public Round PlayRound(Func<Player, Move> askPlayer,
-        Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
+        Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
         // Ny lek vid första rundan; blandas om när korten tar slut
         // (US05: färre än 15 kort kvar → ny blandad lek).
@@ -81,7 +81,7 @@ public class Game
             _deck.ReshuffleIfLow();
         }
 
-        Round round = new(_deck, _seatedPlayers, askPlayer, showDealer, showBusted);
+        Round round = new(_deck, _seatedPlayers, askPlayer, readBet, showDealer, showBusted);
         round.Play();
         return round;
     }

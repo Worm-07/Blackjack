@@ -9,19 +9,23 @@ public class Player : Participant
     public int Wins { get; private set; }
     public int Losses { get; private set; }
     public int Pushes { get; private set; }
+    public ChipWallet Wallet { get; }
 
     // Ny spelare utan tidigare resultat.
     public Player(string name) : base(name)
     {
+        Wallet = new ChipWallet();
     }
 
     // Används av GameStorage (US10) när resultat läses in ur filen.
-    public Player(string name, int wins, int losses, int pushes) : base(name)
+    public Player(string name, int wins, int losses, int pushes, int wallet) : base(name)
     {
         Wins = wins;
         Losses = losses;
         Pushes = pushes;
+        Wallet = new ChipWallet(wallet);
     }
+
 
     /// <summary>Räkna en vunnen runda.</summary>
     public void RecordWin() => Wins++;
