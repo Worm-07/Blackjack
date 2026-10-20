@@ -151,17 +151,14 @@ public class Round
                     player.Wallet.CollectWin();
                     break;
                 case Outcome.Blackjack:
-                    player.Wallet.CollectBlackjack();
                     player.RecordWin();
                     player.Wallet.CollectBlackjack();
                     break;
                 case Outcome.Lose:
-                    player.Wallet.CollectLoss();
                     player.RecordLoss();
                     player.Wallet.CollectLoss();
                     break;
                 case Outcome.Push:
-                    player.Wallet.ReturnBet();
                     player.RecordPush();
                     player.Wallet.ReturnBet();
                     break;

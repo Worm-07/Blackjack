@@ -21,9 +21,11 @@
  *** fallerar alla skärmar tillbaka till radinmatning.
  */
 
+/// <summary>
 /// ConsoleUi: samlingspunkt för all in- och utmatning.
 /// Regelklasserna (Deck, Hand, Player, Dealer, Round) pratar
 /// ALDRIG med Console – allt går via denna klass.
+/// </summary>
 class ConsoleUi
 {
     /// Bredden på rubriker, linjer och banners (kortraderna får vara bredare).
@@ -81,14 +83,12 @@ class ConsoleUi
     // Skärmaritning – gemensamma byggstenar
     // ================================================================
 
-    /// Fråga om tills svaret är giltigt – ingen inmatning får någonsin
-    /// krascha programmet eller tyst acceptera fel.
-    /// <param name="prompt">Frågan som visas för spelaren.</param>
-    /// <param name="errorMessage">Visas om svaret inte är giltigt.</param>
-    /// <param name="isValid">Returnerar true om svaret är giltigt.</param>
-    /// <returns>Det första giltiga svaret.</returns>
-    public string ReadUntilValid(string prompt, string errorMessage,
-        Func<string, bool> isValid)
+    /// <summary>
+    /// Tömmer skärmen så varje vy ritsas "frätt" utan skrollartefakter.
+    /// När utmatningen är omdirigerad (pipe/fil) finns inget konsolfönster
+    /// att töma – då skrivs en avgränsningsrad i stället.
+    /// </summary>
+    private static void Clear()
     {
         if (Console.IsOutputRedirected)
         {
@@ -112,17 +112,16 @@ class ConsoleUi
         Console.WriteLine();
     }
 
-        Console.WriteLine($"Saldo: {player.Wallet.Balance}");
-        int betAmount = int.Parse(
-            ReadUntilValid(
-                "Hur många marker vill du satsa?  ",
-                "=== Ange en insättning över 0 och en du har råd med... ===",
-                s => int.TryParse(s, out int n) && player.Wallet.CanAfford(n)));
-        return betAmount;
+    /// <summary>En tunn avgränsande linje mellan sektioner på livebordet.</summary>
+    private static void DrawRule()
+    {
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine(new string('─', ScreenWidth));
+        Console.ResetColor();
     }
 
-    /// Läs in ett drag: köpa eller stanna.
-    public Move ReadMove(Player player)
+    /// <summary>En sektionrubrik (t.ex. "KALLE  (14)"), markerad i gult om aktiv.</summary>
+    private static void DrawSectionHeader(string text, bool active)
     {
         string marker = active ? "►" : " ";
         Console.ForegroundColor = active ? ConsoleColor.Yellow : ConsoleColor.Cyan;
@@ -159,11 +158,12 @@ class ConsoleUi
     /// smalare i stället – då bryts kort och chips i flera rader.
     private const int MinSeatWidth = 22;
 
-
-    /// Visa en spelares hand: namn + totalt värde ovanför korten så
-    /// att man alltid ser vems hand det är.
-
-    public void ShowHand(Player player)
+    /// <summary>
+    /// Konsolruttens bredd i tecken. När utmatningen är omdirigerad
+    /// (ingen ruta att mäta) eller mätningen misslyckas antas 80 –
+    /// en vanlig minimumbredd.
+    /// </summary>
+    private static int ConsoleWidth
     {
         get
         {
@@ -183,20 +183,31 @@ class ConsoleUi
         }
     }
 
-
-    /// Visa givarens hand med namnet ovanför korten så att man ser
-    /// vems hand det är. Värdet visas först när hålkortet är vänt –
-    /// annars skulle hålkortet "läcka" genom summan.
-  
-    public void ShowDealer(Dealer dealer, bool holeRevealed = false)
+    /// <summary>
+    /// Mattans bredd (inre, utan sidokanter) för ett antal säten:
+    /// bred nog att varje säte får <see cref="MinSeatWidth"/> + 2
+    /// tecken mellanrum (1–3 spelare 72, fyra 94, fem 118), men
+    /// aldrig bredare än konsolrutan – annars skulle raderna vika om
+    /// och mattan se trasig ut. I en smalare konsolruta fördelas
+    /// bredden jämnt mellan sätena i stället (smalare säten per
+    /// spelare/dator), så att alla säten ändå syns i en enda rad.
+    /// </summary>
+    private static int FeltWidthFor(int seatCount)
     {
         int wanted = Math.Max(MinFeltWidth,
             seatCount * MinSeatWidth + 2 * Math.Max(0, seatCount - 1));
         return Math.Max(1, Math.Min(wanted, ConsoleWidth - 2));
     }
 
-    /// Visa rundans utfall för en spelare.
-    public void ShowResult(Player player, Outcome outcome)
+    /// Mattans färg (mörkgrön) och bordskantens färg (guld).
+    private const ConsoleColor FeltColor = ConsoleColor.DarkGreen;
+    private const ConsoleColor TableRimColor = ConsoleColor.DarkYellow;
+
+    /// <summary>
+    /// En cell på mattan: ett textsnutt med egen bakgrundsfärg och
+    /// textfärg. Mattan byggs av rader av celler och ritas av DrawFelt.
+    /// </summary>
+    private sealed class FeltCell
     {
         public FeltCell(string text, ConsoleColor? background = null, ConsoleColor? foreground = null)
         {
@@ -214,9 +225,13 @@ class ConsoleUi
     private static FeltCell Felt(string text, ConsoleColor? foreground = null)
         => new(text, FeltColor, foreground);
 
-    /// Visar husreglerna som gäller och eventuella meddelanden från
-    /// inläsningen (saknad fil, felaktiga rader).
-    public void ShowRules(RuleSet rules)
+    /// <summary>
+    /// Centerar en rad celler: fyller ut med matta till höger och
+    /// vänster så att raden blir exakt <paramref name="width"/> tecken
+    /// bred. Räcker inte bredden klippas raden i stället (FitRow) – så
+    /// kan t.ex. ett sätes kort och chips få sin egen, smala bredd.
+    /// </summary>
+    private static List<FeltCell> CenterRow(List<FeltCell> cells, int width)
     {
         int contentWidth = 0;
         foreach (FeltCell cell in cells)
@@ -271,12 +286,21 @@ class ConsoleUi
     private static List<FeltCell> LabelRow(string text, int width, ConsoleColor? foreground = null)
         => CenterRow([Felt(text, foreground)], width);
 
-    /// Fråga hur många av de valda spelarna som ska vara
-    /// datorspelare. När det redan sitter en mänsklig spelare vid
-    /// bordet får alla nya spelare vara datorer; annars (första
-    /// tillägget) måste minst en vara människa, så max är antalet
-    /// valda spelare minus ett.
-    public int AskComputerCount(Game game)
+    /// <summary>Guldplåt på mattan: "BLACKJACK".</summary>
+    private static List<FeltCell> TitlePlateRow(int width)
+        => CenterRow([new FeltCell("  BLACKJACK  ", TableRimColor, ConsoleColor.Black)], width);
+
+    /// <summary>En tunn avgränsare på mattan mellan givarens och spelarnas fält.</summary>
+    private static List<FeltCell> SeparatorRow(int width)
+        => LabelRow("· · · · · · · · · · · · · · ·", width, ConsoleColor.DarkCyan);
+
+    /// <summary>
+    /// Korten som celler på mattan: vita kort med röd/svart text
+    /// (färgen efter kortfärgen, samma regel som ShowHand) och matta
+    /// i mellanrummen. Returnerar cellerna ocenterade – det är
+    /// CenterRow som fyller ut.
+    /// </summary>
+    private static List<FeltCell> CardCells(IReadOnlyList<Card> cards, int row, bool hideHoleCard, int startIndex = 0)
     {
         List<string[]> rendered = CardRenderer.RenderCards(cards, hideHoleCard, startIndex);
         List<FeltCell> cells = new List<FeltCell>();
@@ -293,8 +317,14 @@ class ConsoleUi
         return cells;
     }
 
-    /// Fråga vilken strategi datorspelaren ska ha.
-    public IPlayerStrategy AskStrategy()
+    /// <summary>
+    /// En hand som en eller flera rader mattceller: så många kort som
+    /// ryms på en rad (ett kort är 9 tecken brett + ett mellanrum) hamnar
+    /// i raden och resten viker om till nästa rad ovanför. Hålkortet
+    /// (andra kortet) förblir dolt även efter omslag tack vare
+    /// startIndex.
+    /// </summary>
+    private static List<List<FeltCell>> HandRows(IReadOnlyList<Card> cards, bool hideHoleCard, int width)
     {
         List<List<FeltCell>> rows = new List<List<FeltCell>>();
         if (cards.Count == 0)
@@ -319,8 +349,12 @@ class ConsoleUi
         return rows;
     }
 
-    /// Visa vad en datorspelare gör så att man kan följa rundan.
-    public void ShowComputerMove(Player player, Move move)
+    /// <summary>
+    /// En visuell chiprad som celler på mattan: varje chip får sin
+    /// egen färg (ChipColor) och mellanrummen är matta. Hur många chips
+    /// som ryms i raden beror på bredden (ChipRows delar upp dem).
+    /// </summary>
+    private static List<List<FeltCell>> ChipRowCells(IReadOnlyList<int> values, int width)
     {
         List<string[]> chips = ChipRenderer.RenderChipRow(values);
         List<List<FeltCell>> rows = new List<List<FeltCell>>();
@@ -344,9 +378,12 @@ class ConsoleUi
         return rows;
     }
 
-    /// Tillverkar ett unikt namn för en datorspelare:
-    /// "Dator 1", "Dator 2", …
-    private static string UniqueComputerName(Game game, int i)
+    /// <summary>
+    /// Rader med satsningschips: rymmer inte alla chips i bredden delas
+    /// de upp i flera rader. Ett chip är 9 tecken + 2 mellanrum, så
+    /// smala breddar (t.ex. ett säte) får färre chips per rad.
+    /// </summary>
+    private static List<List<FeltCell>> ChipRows(IReadOnlyList<int> values, int width)
     {
         int perRow = Math.Max(1, (width + 2) / 11);
 
@@ -429,15 +466,17 @@ class ConsoleUi
     // US03: huvudmeny med piltangentnavigering
     // ================================================================
 
-    /// Antal spelare som sitter vid bordet (inkl. datorspelare, US13).
+    /// <summary>Antal spelare som sitter vid bordet (inkl. datorspelare, US13).</summary>
     private static int SeatedCount(Game game)
         => game.SeatedPlayers.Count;
 
-
-    /// Huvudmenyn: spela runda / spelare (visa, lägga till) / avsluta.
-    /// Returnerar true om spelaren ska spela en runda, false om programmet
-    /// ska avslutas.
-    
+    /// <summary>
+    /// Huvudmenyn: Starta runda / Highscores / Spelare / Regler / Avsluta.
+    /// Navigera med ↑/↓ och bekräfta med Enter; med omdirigerad inmatning
+    /// skriver man menynumret i stället.
+    /// Returnerar true om användaren valde att spela en runda,
+    /// false om programmet ska avslutas.
+    /// </summary>
     public bool ShowMenu(Game game)
     {
         _game = game;
@@ -537,8 +576,247 @@ class ConsoleUi
         }
     }
 
+    // ================================================================
+    // Highscores – mest vunnen/förlorad + sortering i programmet
+    // ================================================================
+
+    /// <summary>
+    /// Highscore-skärmen. Visar mest vunnen och mest förlorad spelare
+    /// upptill och en tabell över allas statistik.
+    /// Sortering i programmet: 1 = flest vinster, 2 = flest förluster,
+    /// 3 = namn A-Ö. Enter/Esc (eller en tom rad) tillbaka till menyn.
+    /// </summary>
+    public void ShowHighscores(Game game)
+    {
+        List<Player> all = game.SavedPlayers.ToList();
+        int sortMode = 1;      // 1 = vinster, 2 = förluster, 3 = namn
+        int firstVisible = 0;  // scroll: index på första synliga raden
+
+        while (true)
+        {
+            List<Player> sorted = SortHighscores(all, sortMode);
+
+            Clear();
+            DrawTitle("HIGHSCORES");
+
+            if (all.Count == 0)
+            {
+                Console.WriteLine("   (inga sparade spelare)");
+            }
+            else
+            {
+                // Mest vunnen / mest förlorad – skärmens topp.
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"   MEST VUNNET:   {TopScore(all, p => p.Wins, "vinst", "vinster")}");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"   MEST FÖRLORAT: {TopScore(all, p => p.Losses, "förlust", "förluster")}");
+                Console.ResetColor();
+                Console.WriteLine();
+
+                // Statistiktabellen; scrollas om den är längre än fönstret.
+                int rows = Math.Min(VisibleRows(), sorted.Count);
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"   {"#",3}  {"Namn",-18} {"Vinster",8} {"Förluster",10} {"Lika",4} {"Mest antal marker under spel",28}");
+                Console.ResetColor();
+
+                for (int i = 0; i < rows; i++)
+                {
+                    Player p = sorted[firstVisible + i];
+                    int rank = firstVisible + i + 1;
+                    Console.WriteLine($"   {rank,3}  {p.Name,-18} {p.Wins,8} {p.Losses,10} {p.Pushes,4} {p.MaxChipsDuringGame,28}");
+                }
+
+                if (sorted.Count > rows)
+                    DrawFooter($"... {sorted.Count - rows} spelare till   ·   ↑/↓ = scrolla");
+            }
+
+            DrawFooter("[1] flest vinster   [2] flest förluster   [3] namn A-Ö   ·   Enter/Esc = tillbaka");
+
+            // Läs nästa kommando.
+            if (InteractiveConsole)
+            {
+                while (true)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+                    if (key.Key == ConsoleKey.D1 || key.KeyChar == '1') { sortMode = 1; break; }
+                    if (key.Key == ConsoleKey.D2 || key.KeyChar == '2') { sortMode = 2; break; }
+                    if (key.Key == ConsoleKey.D3 || key.KeyChar == '3') { sortMode = 3; break; }
+                    if (key.Key == ConsoleKey.UpArrow)
+                    {
+                        firstVisible = Math.Max(0, firstVisible - 1);
+                        break;
+                    }
+                    if (key.Key == ConsoleKey.DownArrow)
+                    {
+                        firstVisible++; // kläms till max nedan
+                        break;
+                    }
+                    if (key.Key is ConsoleKey.Enter or ConsoleKey.Escape)
+                        return; // tillbaka till huvudmenyn
+                    // övriga tangenter ignoreras
+                }
+            }
+            else
+            {
+                Console.Write("   Sortera (1/2/3) eller Enter för att gå tillbaka: ");
+                string input = (Console.ReadLine() ?? "").Trim();
+                if (input is "1" or "2" or "3")
+                    sortMode = int.Parse(input);
+                else
+                    return; // tom rad eller annat = tillbaka
+            }
+
+            // Kläm scroll-offsetet till ett giltigt intervall.
+            int maxOffset = Math.Max(0, sorted.Count - VisibleRows());
+            firstVisible = Math.Clamp(firstVisible, 0, maxOffset);
+        }
+    }
+
+    /// <summary>
+    /// Sorterar highscorelistan: 1 = flest vinster (sedan minst förluster
+    /// vid oavgjort), 2 = flest förluster (sedan flest vinster vid oavgjort),
+    /// 3 = namn A-Ö.
+    /// </summary>
+    private static List<Player> SortHighscores(List<Player> players, int sortMode)
+    {
+        return sortMode switch
+        {
+            1 => players.OrderByDescending(p => p.Wins)
+                        .ThenBy(p => p.Losses)
+                        .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                        .ToList(),
+            2 => players.OrderByDescending(p => p.Losses)
+                        .ThenByDescending(p => p.Wins)
+                        .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                        .ToList(),
+            _ => players.OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                        .ToList()
+        };
+    }
+
+    /// <summary>
+    /// Spelaren (spelarna) med högst värde i statistiken. Oavgjorda
+    /// toppar listas alla, förenade med " & ". Returnerar t.ex.
+    /// "Kalle & Hedda (2 vinster)".
+    /// </summary>
+    private static string TopScore(IReadOnlyList<Player> players, Func<Player, int> score,
+        string wordSingular, string wordPlural)
+    {
+        if (players.Count == 0)
+            return "(inga)";
+
+        int best = players.Max(score);
+        string names = string.Join(" & ", players.Where(p => score(p) == best).Select(p => p.Name));
+        string unit = best == 1 ? wordSingular : wordPlural;
+        return $"{names} ({best} {unit})";
+    }
+
+    /// <summary>Hur många tabellrader som ryms på skärmen.</summary>
+    private static int VisibleRows()
+    {
+        try
+        {
+            // Rubrik, toppstatistik, tabellrubrik och hjälptext tar ca 13 rader.
+            return Math.Max(4, Console.WindowHeight - 13);
+        }
+        catch
+        {
+            return 20; // omdirigerad konsol utan fönsterhöjd
+        }
+    }
+
+    // ================================================================
+    // Reglerskärmen – tydliga spelregler
+    // ================================================================
+
+    /// <summary>
+    /// En skärm som tydligt sammanfattar spelets regler: först husreglerna
+    /// ur rules.txt (Tillval 3) med eventuella inläsningsmeddelanden,
+    /// sedan de grundläggande spelreglerna.
+    /// Enter (eller en rad i fallback-läget) tillbaka till menyn.
+    /// </summary>
+    public void ShowRules(RuleSet rules)
+    {
+        Clear();
+        DrawTitle("SPELREGLER");
+
+        // Meddelanden från inläsningen av husreglerna, om sådana finns.
+        foreach (string message in rules.Messages)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"   OBS: {message}");
+            Console.ResetColor();
+        }
+
+        // Husreglerna som gäller vid detta bord (Tillval 3, rules.txt)
+        // följt av de grundläggande spelreglerna. Raderna som inte börjar
+        // med blanksteg är rubriker.
+        string[] lines =
+        [
+            "HUSREGLER (rules.txt)",
+            $"  Antal lekar: {rules.NumberOfDecks}",
+            $"  Blandas om vid färre än {rules.ReshuffleThreshold} kort",
+            $"  Givaren {(rules.DealerHitsOnSoftSeventeen ? "drar" : "stannar")} på mjuk 17",
+            $"  Naturlig tjugoett {(rules.NaturalBeatsThreeCardTwentyOne ? "slår" : "slår inte")} 21 av tre kort",
+            "",
+            "MÅL",
+            "  Kom närmare 21 än givaren utan att överstiga 21.",
+            "",
+            "KORTENS VÄRDE",
+            "  2–10: sitt eget värde",
+            "  Knekt, Dama, Kung: 10",
+            "  Ess: 1 eller 11 – det som är bäst för handen",
+            "",
+            "TJUGOETT (BLACKJACK)",
+            "  Naturlig 21 (ess + tiokort/klätt på de två första korten)",
+            $"  {(rules.NaturalBeatsThreeCardTwentyOne ? "slår" : "slår inte")} en 21 byggd av tre eller fler kort.",
+            "",
+            "DIN TUR",
+            "  Köpa (k) = ta ett kort till · Stanna (s) = avsluta din tur.",
+            "  Över 21 = spräckt = förlust direkt.",
+            "",
+            "GIVAREN",
+            "  Väntar tills alla spelare stannat eller spräckt, vänder",
+            "  hålkortet och köpar medan värdet är 16 eller lägre.",
+            rules.DealerHitsOnSoftSeventeen
+                ? "  Stannar på hård 17, drar på mjuk 17."
+                : "  Stannar på 17 eller högre (även mjuk 17).",
+            "",
+            "AVGÖRANDE",
+            "  Vinst · Förlust · Lika (push) · Tjugoett.",
+            "  Lika räknas varken som vinst eller förlust.",
+            "",
+            "LEKEN",
+            $"  {rules.NumberOfDecks * 52} kort. Blandas om när färre än {rules.ReshuffleThreshold} kort är kvar.",
+            "  1–5 spelare per runda."
+        ];
+
+        foreach (string line in lines)
+        {
+            if (line.Length == 0)
+            {
+                Console.WriteLine();
+                continue;
+            }
+
+            bool header = !line.StartsWith("  ");
+            Console.ForegroundColor = header ? ConsoleColor.Cyan : ConsoleColor.White;
+            Console.WriteLine(line);
+            Console.ResetColor();
+        }
+
+        WaitForEnter();
+    }
+
+    // ================================================================
+    // Spelare – visa vid bordet / tillgängliga, lägg till (US01/US02)
+    // ================================================================
+
+    /// <summary>
     /// Visar spelare vid bordet respektive tillgängliga spelare
     /// och ger möjlighet att lägga till nya.
+    /// </summary>
     private void ShowPlayers(Game game)
     {
         Clear();
@@ -587,9 +865,11 @@ class ConsoleUi
             AddSeatedPlayers(game);
     }
 
-    /// Frågar antal (US01), direkt efter det hur många av
-    /// spelarna som är datorer (US13), och sedan namn (US01/US11) på
-    /// de mänskliga. Sätter alla ner vid bordet.
+    /// <summary>
+    /// Frågar antal (US01), direkt efter det hur många av spelarna som är
+    /// datorer (US13), och sedan namn (US01/US11) på de mänskliga.
+    /// Sätter alla ner vid bordet.
+    /// </summary>
     private void AddSeatedPlayers(Game game)
     {
         // Max 5 spelare vid bordet totalt, inte bara per gång.
@@ -1116,6 +1396,19 @@ class ConsoleUi
 
             Console.WriteLine();
         }
+    }
+
+    /// <summary>US15: meddelande för varje spelare som fått slut på marker
+    /// och lämnat bordet.</summary>
+    public void ShowEliminated(List<Player> eliminated)
+    {
+        if (eliminated.Count == 0)
+            return;
+
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        foreach (Player p in eliminated)
+            Console.WriteLine($" === {p.Name} har inga fler marker och lämnar bordet ===");
+        Console.ResetColor();
     }
 
     /// <summary>Hjärter och ruter röda, klöver och spader svarta, baksidan mörkblå.</summary>
