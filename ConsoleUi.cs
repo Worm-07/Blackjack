@@ -857,7 +857,7 @@ class ConsoleUi
         }
 
         string add = ReadUntilValid(
-            "\n   Vill du lägga till spelare? (j/nej) ",
+            "\n   Vill du lägga till spelare? (j/n) ",
             " === J ELLER NEJ ===",
             s => s.Length == 1 && (s[0] is 'j' or 'J' or 'n' or 'N'));
 
