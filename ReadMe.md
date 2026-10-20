@@ -71,6 +71,13 @@ Jag fixade också några buggar som vi hittade när vi testade: naturligt 21 mot
 **Tillval 3 - Husregler från konfigurationsfil (Andreas):** Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer specen från uppgiften. Saknas filen eller är ett värde fel används standardvärdet och en varning visas. Standardvärdena enligt specen i uppgiftsbeskrivningen är 52 kort, givaren stannar på mjuk 17, naturlig 21 betalar enligt avgörandetabellen och omblandning vid <15 kort.
 
 **Tillval 4 – Satsningar och marker (Emil Chau):** Varje spelare har en plånbok (`ChipWallet`) med marker, och nya spelare startar med 100. Innan korten delas ut frågar `ConsoleUi` hur många marker man vill satsa, och svaret valideras så att insatsen varken är noll eller större än saldot. Vinst betalar 1:1, naturlig tjugoett betalar 3:2 (avrundas nedåt vid udda insats) och lika ger insatsen tillbaka. `Round` pratar aldrig med konsolen: insatsen skickas in som en funktion (`Func<Player, int>`), på samma sätt som spelarens beslut, och utbetalningen sker i `Round.Play()` och inte i `Settle`, som är ren och anropas igen för att visa resultatet. Saldot sparas i `players.txt` och visas i spelarlistan. En spelare som får slut på marker lämnar bordet efter rundan (`Game.RemoveBrokePlayers`), kan inte sättas ned igen och markeras med "SLUT PÅ MARKER".
+## Regler som gäller
+Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer specen. Saknas filen eller är ett värde fel används standardvärdet och en varning visas.
+Enligt specen i uppgiftsbeskrivningen är standard reglerna följande: 
+- 52 kort 
+- Givaren stannar på mjuk 17,
+- Naturlig 21 betalar enligt avgörandetabellen
+- Omblandning vid <15 kort.
 
 ## Kända brister
 
