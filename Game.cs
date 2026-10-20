@@ -27,7 +27,8 @@ public class Game
     // Spelare som sitter vid bordet (spelar i nästa runda)
     public IReadOnlyList<Player> SeatedPlayers => _seatedPlayers;
 
-    // Spelare som finns sparade men inte sitter vid bordet
+    // Spelare som finns sparade men inte sitter vid bordet.
+    // US15: spelare utan marker (IsBroke) ingår inte – de kan inte spela igen.
     public List<Player> GetAvailablePlayers()
     {
         return _savedPlayers.Where(p => !_seatedPlayers.Contains(p) && !p.Wallet.IsBroke).ToList();
@@ -54,6 +55,13 @@ public class Game
     {
         _seatedPlayers.Add(player);
     }
+
+    /// <summary>
+    /// US15: tar bort spelare som har slut på marker från bordet och
+    /// returnerar dem, så att ConsoleUi kan visa ett meddelande (Game
+    /// skriver aldrig ut något själv). De sparade spelarna ligger kvar i
+    /// _savedPlayers med saldo 0 och hamnar på topplistan.
+    /// </summary>
     public List<Player> RemoveBrokePlayers()
     {
         List<Player> removed = _seatedPlayers
@@ -112,6 +120,10 @@ public class Game
         return round;
     }
 
+    /// <summary>
+    /// US15: topplistan – sparade spelare som är slut på marker, med flest
+    /// vinster överst (lika många vinster → i bokstavsordning).
+    /// </summary>
     public List<Player> GetHighscoreList()
     {
         return _savedPlayers.Where(p => p.Wallet.IsBroke).OrderByDescending(p => p.Wins).ThenBy(p => p.Name).ToList();

@@ -215,11 +215,11 @@ class ConsoleUi
         }
     }
 
-    /// <summary>Visar spelare vid bordet respektive tillgängliga spelare
-    /// och ger möjlighet att lägga till nya.</summary>
+    /// <summary>Visar topplistan (US15), spelare vid bordet respektive
+    /// tillgängliga spelare och ger möjlighet att lägga till nya.</summary>
     private void ShowPlayers(Game game)
     {
-        List<Player> highscore = game.GetHighscoreList();
+        List<Player> highscore = game.GetHighscoreList(); // US15: utslagna spelare, flest vinster först
         List<Player> available = game.GetAvailablePlayers();
         List<Player> seated = game.SeatedPlayers.ToList();
 
@@ -344,6 +344,8 @@ class ConsoleUi
         }
     }
 
+    /// <summary>US15: meddelande för varje spelare som fått slut på marker
+    /// och lämnat bordet.</summary>
     public void ShowEliminated(List<Player> eliminated)
     {
         foreach (Player p in eliminated)

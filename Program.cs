@@ -29,9 +29,10 @@ while (true)
         foreach (Player p in round.Players)
             ui.ShowResult(p, round.Settle(p));
 
+        // US15: spelare som är slut på marker lämnar bordet och
+        // hamnar på topplistan (menyval 2). Game returnerar vilka, ConsoleUi visar.
         List<Player> eliminated = game.RemoveBrokePlayers();
         ui.ShowEliminated(eliminated);
-
 
         new GameStorage().SavePlayers(game.SavedPlayers); // US10
     }

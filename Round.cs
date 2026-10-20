@@ -127,6 +127,8 @@ public class Round
         PlayPlayers();
         PlayDealer();
 
+        // US15: utbetalning görs här (en gång per spelare) och inte i Settle,
+        // som är ren och anropas igen av Program.cs för att visa resultatet.
         foreach (var player in _players)
         {
             switch (Settle(player))
