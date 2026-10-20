@@ -186,7 +186,7 @@ class ConsoleUi
             Console.WriteLine();
             Console.WriteLine("=== Välkommen till Blackjack! ===");
             Console.WriteLine("1. Spela runda");
-            Console.WriteLine("2. Spelare (visa/lägg till)");
+            Console.WriteLine("2. Spelare (visa/lägg till/topplista)");
             Console.WriteLine("3. Avsluta");
 
             string choice = ReadUntilValid(
@@ -207,6 +207,7 @@ class ConsoleUi
 
                 case "2":
                     ShowPlayers(game);
+                    game.GetHighscoreList();
                     break;
 
                 case "3":
