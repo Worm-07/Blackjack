@@ -35,13 +35,8 @@ public class Round
         _readBet = readBet;
     }
 
-    /// <summary>De spelare som deltar i given (för att visa resultat efter rundan).</summary>
+    /// De spelare som deltar i given (för att visa resultat efter rundan).
     public IReadOnlyList<Player> Players => _players;
-
-    /// <summary>
-    /// Dela ut: två kort öppet till varje spelare, ett öppet och ett
-    /// dolt till givaren.
-    /// </summary>
 
     public void Stake()
     {
@@ -50,6 +45,9 @@ public class Round
             player.Wallet.Bet(_readBet(player));
         }
     }
+
+    /// Dela ut: två kort öppet till varje spelare, ett öppet och ett
+    /// dolt till givaren.
     public void DealCards()
     {
         foreach (var player in _players)
@@ -62,10 +60,8 @@ public class Round
         _dealer.AddCard(_deck.Deal()); // hole card
     }
 
-    /// <summary>
     /// Spelarna i tur och ordning: fråga efter beslut (köpa/stanna),
     /// köp så länge spelaren vill. Spräckt = omedelbar förlust.
-    /// </summary>
     public void PlayPlayers()
     {
         foreach (var player in _players)
@@ -78,10 +74,8 @@ public class Round
         }
     }
 
-    /// <summary>
     /// Givarens tur: vänd hålkortet, köp medan värdet är ≤16,
     /// stanna på 17 eller högre (US07).
-    /// </summary>
     public void PlayDealer()
     {
         while (_dealer.ShouldHit)
@@ -89,7 +83,6 @@ public class Round
         _showDealer?.Invoke(_dealer, true); // hålkortet vänt, visa slutvärde
     }
 
-    /// <summary>
     /// Avgörande för en spelare (tabellen i specen):
     /// spelare spräckt → Lose
     /// naturlig 21 på båda sidor → Push
@@ -99,7 +92,6 @@ public class Round
     /// givare naturlig 21 → Lose (eller Push mot spelarens 21 av tre kort,
     ///   om husregeln är avstängd)
     /// annars: högre hand vinner; lika → Push
-    /// </summary>
     public Outcome Settle(Player player)
     {
         if (player.IsBusted)
@@ -137,7 +129,7 @@ public class Round
         return Outcome.Push;
     }
 
-    /// <summary>Kör hela given och uppdaterar spelarnas statistik.</summary>
+    /// Kör hela given och uppdaterar spelarnas statistik.
     public void Play()
     {
         Stake();

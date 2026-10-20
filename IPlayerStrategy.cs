@@ -8,8 +8,6 @@
 /// strategier samtidigt.
 public interface IPlayerStrategy
 {
-    /// <summary>
     /// Bestäm nästa drag utifrån spelarens hand och givarens öppna kort.
-    /// </summary>
     Move Decide(Hand hand, Card dealerUpCard);
 }

@@ -1,6 +1,5 @@
 /*
  ***Tillval 3 (US14): Husregler från konfigurationsfil***
- ***Skelett – metoden är markerad med TODO och ska implementeras.***
  */
 
 /// Regelinställningar som läses in från en textfil vid start och skickas
@@ -32,12 +31,10 @@ public class RuleSet
     public const int MaxDecks = 8;
     public const int MinThreshold = 5;
 
-    /// <summary>
     /// Läser in husreglerna. Format: en regel per rad, "Nyckel=Värde".
     /// Tomma rader och rader som börjar med # ignoreras.
     /// Saknas filen, eller är en rad trasig, används standardvärdet och
     /// ett meddelande läggs i Messages. Metoden kraschar aldrig.
-    /// </summary>
     public static RuleSet LoadFromFile(string path = FileName)
     {
         RuleSet defaults = new RuleSet();
@@ -141,7 +138,7 @@ public class RuleSet
         };
     }
 
-    /// <summary>Tolkar ja/nej (och true/false) utan hänsyn till versaler.</summary>
+    /// Tolkar ja/nej (och true/false) utan hänsyn till versaler.
     private static bool TryParseBool(string text, out bool result)
     {
         switch (text.ToLowerInvariant())

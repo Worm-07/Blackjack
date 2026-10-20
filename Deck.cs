@@ -7,23 +7,18 @@
 /// delar ut och håller koll på hur många kort som är kvar.
 public class Deck
 {
-    /// US06: färre än 15 kort kvar → ny blandad lek inför nästa runda.
-    /// Bytet sker aldrig mitt i en runda.
-    /// Tillval 3: antal lekar och ombladningströskel kommer från RuleSet.
-
     private readonly List<Card> _cards = new();
     private readonly Random _random;
     private readonly int _numberOfDecks;
 
-     /// Färre kort än så här kvar → ny blandad lek inför nästa runda.
-    /// Bytet sker aldrig mitt i en runda.
+    /// Färre kort än så här kvar → ny blandad lek inför nästa runda
+    /// (Tillval 3: tröskeln kommer från RuleSet). Bytet sker aldrig
+    /// mitt i en runda.
     public int ReshuffleThreshold { get; }
 
-    /// <summary>
     /// Random delas av hela programmet (skapas en gång i Program.cs).
     /// Skapar man en ny Random vid varje blandning får man samma lek i
     /// on och om igen, eftersom den såddas från klockan.
-    /// </summary>
     public Deck(Random random, RuleSet rules)
     {
         _random = random;
@@ -54,10 +49,8 @@ public class Deck
         }
     }
 
-    /// <summary>
     /// Fisher-Yates: gå baklänges genom leken och byt plats på varje kort
     /// med ett slumpmässigt valt kort bland dem som ligger före.
-    /// </summary>
     public void Shuffle()
     {
         for (int i = _cards.Count - 1; i > 0; i--)
@@ -67,11 +60,10 @@ public class Deck
         }
     }
 
-    /// <summary>Tar bort och returnerar nästa kort i leken.</summary>
+    /// Tar bort och returnerar nästa kort i leken.
     public Card Deal()
     {
         if (IsEmpty)
-                if (IsEmpty)
         {
             // Leken tog slut mitt i en runda: ta fram en ny, blandad lek.
             BuildDeck();
@@ -83,10 +75,8 @@ public class Deck
         return card;
     }
 
-    /// <summary>
     /// Anropas inför varje ny runda: blandas om om färre än
     /// ReshuffleThreshold kort är kvar (värdet kommer från RuleSet).
-    /// </summary>
     public void ReshuffleIfLow()
     {
         if (RemainingCards < ReshuffleThreshold)

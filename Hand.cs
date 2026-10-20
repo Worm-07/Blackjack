@@ -22,26 +22,22 @@ public class Hand
         _cards.Add(card);
     }
 
-    /// <summary>Tömmer handen – används när en ny runda startar.</summary>
+    /// Tömmer handen – används när en ny runda startar.
     public void Clear()
     {
         _cards.Clear();
     }
 
-    /// <summary>
     /// Handens totala värde: 2–10 sitt eget värde, klätt = 10,
     /// ess = 1 eller 11 – det som är bäst utan att spräcka.
-    /// </summary>
     public int GetValue()
     {
         (int value, _) = ComputeValue();
         return value;
     }
 
-    /// <summary>
     /// Mjuk hand: minst ett ess räknas som 11 i det aktuella värdet.
     /// Exempel: A + 6 är en mjuk 17. Drar man 9 blir det A + 6 + 9 = hård 16.
-    /// </summary>
     public bool IsSoft
     {
         get
@@ -52,7 +48,7 @@ public class Hand
         }
     }
 
-    /// <summary>Spräckt: handens värde över 21.</summary>
+    ///Spräckt: handens värde över 21.
     public bool IsBusted
     {
         get
@@ -61,10 +57,8 @@ public class Hand
         }
     }
 
-    /// <summary>
     /// Naturlig tjugoett: exakt två kort som tillsammans blir 21
     /// (ess + tiokort/klätt).
-    /// </summary>
     public bool IsNatural
     {
         get
@@ -73,10 +67,8 @@ public class Hand
         }
     }
 
-    /// <summary>
     /// Basvärde för ett kort: 2–10 sitt värde, klätt = 10, ess = 11.
     /// Esset justeras av GetValue/IsSoft – Card håller bara färg + valör.
-    /// </summary>
     private static int GetCardValue(Card card)
     {
         return card.Rank switch
@@ -86,12 +78,10 @@ public class Hand
             _ => (int)card.Rank // 2–10 har sitt eget värde i enumen
         };
     }
-
-    /// <summary>
+    
     /// Räknar ut handens värde. Returnerar värdet och hur många ess som
     /// fortfarande räknas som 11. Summerar först med alla ess som 11 och
     /// sänker ess till 1 (−10) så länge summan överstiger 21.
-    /// </summary>
     private (int Value, int SoftAces) ComputeValue()
     {
         int value = 0;

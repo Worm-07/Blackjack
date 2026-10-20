@@ -4,20 +4,15 @@
 
 /// Läser och skriver spelare och resultat till fil, så att de finns kvar
 /// nästa gång programmet startas.
-///
-/// Filformat, en spelare per rad:  Namn;Vinster;Förluster;Lika;Saldo;MestAntalMarkerUnderSpel
-/// Exempel:                         Danie;12;5;3;100;140
-/// Gamla filer med 5 fält (utan MestAntalMarkerUnderSpel) läses in – då
-/// räcker saldot som utgångsvärde.
+/// Filformat, en spelare per rad:  Namn;Vinstar;Förluster;Lika;Saldo
+/// Exempel:                         Daniel;12;5;3;100
 public class GameStorage
 {
     /// Filen ligger i programkatalogen.
     public const string FileName = "players.txt";
 
-    /// <summary>
     /// Läser alla sparade spelare. Saknas filen → tom lista (inte ett fel).
     /// Trasiga rader ignoreras – programmet ska aldrig krascha på filen.
-    /// </summary>
     public List<Player> LoadPlayers()
     {
         var players = new List<Player>();
@@ -50,7 +45,7 @@ public class GameStorage
         return players;
     }
 
-    /// <summary>Skriv alla spelare (namn + statistik + saldo) till fil.</summary>
+    /// Skriv alla spelare (namn + statistik + saldo) till fil.
     public void SavePlayers(IReadOnlyList<Player> players)
     {
         File.WriteAllLines(

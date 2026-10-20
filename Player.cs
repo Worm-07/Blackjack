@@ -21,7 +21,7 @@ public class Player : Participant
     // Strategin bestämmer draget – Player bestämmer aldrig själv.
     public IPlayerStrategy? Strategy { get; }
 
-    /// <summary>True om spelaren är en datorspelare (US13).</summary>
+    /// True om spelaren är en datorspelare (US13).
     public bool IsComputer => Strategy != null;
 
     // Ny spelare utan tidigare resultat.
@@ -51,14 +51,13 @@ public class Player : Participant
         MaxChipsDuringGame = Math.Max(maxChipsDuringGame, wallet);
     }
 
-
-    /// <summary>Räkna en vunnen runda.</summary>
+    /// Räkna en vunnen runda.
     public void RecordWin() => Wins++;
 
-    /// <summary>Räkna en förlorad runda.</summary>
+    /// Räkna en förlorad runda.
     public void RecordLoss() => Losses++;
 
-    /// <summary>Räkna en lika runda (räknas varken som vinst eller förlust).</summary>
+    /// Räkna en lika runda (räknas varken som vinst eller förlust).
     public void RecordPush() => Pushes++;
 
     /// <summary>
