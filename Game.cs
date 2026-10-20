@@ -61,6 +61,16 @@ public class Game
     }
 
     /// <summary>
+    /// US15: tar bort spelare som gått slut på marker (saldo 0) från
+    /// bordet – de kan inte satsa och kan alltså inte fortsätta spela.
+    /// Anropas efter varje runda.
+    /// </summary>
+    public void RemoveBrokePlayers()
+    {
+        _seatedPlayers.RemoveAll(p => p.Wallet.IsBroke);
+    }
+
+    /// <summary>
     /// US13: skapar en datorspelare med given strategi och sätter ner
     /// den vid bordet. Spelaren läggs EJ i _savedPlayers – den sparas
     /// alltså inte till players.txt och kan inte krocka med ett
@@ -108,7 +118,10 @@ public class Game
 
         Round round = new(_deck, _rules, players, askPlayer, readBet, showDealer, showBusted);
         round.Play();
-       
+
+        // US15: spelare som fick slut på marker under rundan lämnar bordet.
+        RemoveBrokePlayers();
+
         return round;
     }
 }

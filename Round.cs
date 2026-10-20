@@ -148,19 +148,31 @@ public class Round
 
         foreach (var player in _players)
         {
+            // US15: betala ut enligt avgörandet (vinst 1:1, naturlig 21 3:2,
+            // lika → insatsen tillbaka; vid förlust är insatsen redan borta).
             switch (Settle(player))
             {
                 case Outcome.Win:
+                    player.RecordWin();
+                    player.Wallet.CollectWin();
+                    break;
                 case Outcome.Blackjack:
                     player.RecordWin();
+                    player.Wallet.CollectBlackjack();
                     break;
                 case Outcome.Lose:
                     player.RecordLoss();
+                    player.Wallet.CollectLoss();
                     break;
                 case Outcome.Push:
                     player.RecordPush();
+                    player.Wallet.ReturnBet();
                     break;
             }
+
+            // US15: uppdatera "mest antal marker under spel" efter
+            // avgörandet – saldot kan ha ökat genom utbetalningen.
+            player.UpdateChipsPeak();
         }
     }
 }

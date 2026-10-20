@@ -53,13 +53,15 @@ public static class CardRenderer
     public static bool IsFaceDown(int index, bool hideHoleCard) => hideHoleCard && index == HoleCardIndex;
 
     // Ritar varje kort i handen för sig. ConsoleUi använder den för att färga korten olika.
-    public static List<string[]> RenderCards(IReadOnlyList<Card> cards, bool hideHoleCard = false)
+    public static List<string[]> RenderCards(IReadOnlyList<Card> cards, bool hideHoleCard = false, int startIndex = 0)
     {
         List<string[]> renderedCards = new List<string[]>();
 
         for (int i = 0; i < cards.Count; i++)
         {
-            renderedCards.Add(IsFaceDown(i, hideHoleCard) ? RenderFaceDown() : RenderCard(cards[i]));
+            // startIndex låter en hand ritas i delar (t.ex. om den
+            // viks till flera rader) utan att förlora hålkortets plats.
+            renderedCards.Add(IsFaceDown(i + startIndex, hideHoleCard) ? RenderFaceDown() : RenderCard(cards[i]));
         }
 
         return renderedCards;
