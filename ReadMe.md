@@ -70,6 +70,14 @@ Jag fixade också några buggar som vi hittade när vi testade: naturligt 21 mot
 
 **Tillval 3 - Husregler från konfigurationsfil (Andreas):** Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer specen från uppgiften. Saknas filen eller är ett värde fel används standardvärdet och en varning visas. Standardvärdena enligt specen i uppgiftsbeskrivningen är 52 kort, givaren stannar på mjuk 17, naturlig 21 betalar enligt avgörandetabellen och omblandning vid <15 kort.
 
+## Regler som gäller
+Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer specen. Saknas filen eller är ett värde fel används standardvärdet och en varning visas.
+Enligt specen i uppgiftsbeskrivningen är standard reglerna följande: 
+- 52 kort 
+- Givaren stannar på mjuk 17,
+- Naturlig 21 betalar enligt avgörandetabellen
+- Omblandning vid <15 kort.
+
 ## Kända brister
 
 - US15: försäkring (överkurs) saknas.
