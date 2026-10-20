@@ -68,15 +68,7 @@ Jag fixade också några buggar som vi hittade när vi testade: naturligt 21 mot
 
 **Tillval 2 – Datorspelare med strategi (Daniel Norberg):** Direkt efter valet av antal spelare (totalt antal: mänskliga + datorer) väljer man hur många av dem som ska vara datorspelare. Det måste alltid bli minst en mänsklig spelare, så max antal datorer är de valda spelarna minus ett. Varje datorspelare får automatiskt ett namn ("Dator 1", "Dator 2", …) och en strategi – antingen den enkla (köpa under 17) eller grundstrategin (tabell). Dator- och mänskliga spelare sitter samtidigt vid bordet och Round vet inte skillnaden: beslutet levereras in som en funktion där `Program.cs` väljer mellan `ConsoleUi` och `IPlayerStrategy`. Mänskliga spelare spelar först i tur och ordning, sedan datorspelarna. Datorspelare sparas inte i `players.txt`, och deras insats slumpas mellan 5 och hela saldot (aldrig en fast summa).
 
-## Regler som gäller
-
-Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer
-specen. Saknas filen eller är ett värde fel används standardvärdet och en
-varning visas.
-Enligt specen i uppgiftsbeskrivningen (52 kort, givaren stannar på mjuk 17,
-naturlig 21 betalar enligt avgörandetabellen, omblandning vid <15 kort).
-Avvikelser från specifikationen listas här:
-- (inga än)
+**Tillval 3 - Husregler från konfigurationsfil (Andreas):** Husreglerna läses från `rules.txt` vid start (tillval 3). Standardvärdena följer specen från uppgiften. Saknas filen eller är ett värde fel används standardvärdet och en varning visas. Standardvärdena enligt specen i uppgiftsbeskrivningen är 52 kort, givaren stannar på mjuk 17, naturlig 21 betalar enligt avgörandetabellen och omblandning vid <15 kort.
 
 ## Kända brister
 
