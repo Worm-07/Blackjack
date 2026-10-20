@@ -35,7 +35,7 @@ den branchen är mergad till dev.
 
 | Gruppmedlem | Tillval | Branch |
 |---|---|---|
-| (fyll i) | (1–5) | (US12–US16) |
+| Daniel Norberg | 2 – Datorspelare med strategi | US13-Computer-players |
 | Andreas | 3. Husregler från konfigurationsfil | feature-house-rules |
 | Hadi Bahaulddin | 1 – Kortgrafik | feature-card-graphics, US18-visa-hander |
 | (fyll i) | (1–5) | (branch) |
@@ -44,7 +44,7 @@ den branchen är mergad till dev.
 
 Jag fixade också några buggar som vi hittade när vi testade: naturligt 21 mot 21 med tre kort, att spelet kraschade när korten tog slut, max 5 spelare vid bordet och att "Dama" skulle vara "Dam".
 
-**Tillval 2 – Datorspelare:** Direkt efter valet av antal spelare (totalt antal: mänskliga + datorer) väljer man hur många av dem som ska vara datorspelare. Det måste alltid bli minst en mänsklig spelare, så max antal datorer är de valda spelarna minus ett. Varje datorspelare får automatiskt ett namn ("Dator 1", "Dator 2", …) och en strategi – antingen den enkla (köpa under 17) eller grundstrategin (tabell). Dator- och mänskliga spelare sitter samtidigt vid bordet och Round vet inte skillnaden: beslutet levereras in som en funktion där `Program.cs` väljer mellan `ConsoleUi` och `IPlayerStrategy`. Mänskliga spelare spelar först i tur och ordning, sedan datorspelarna. Datorspelare sparas inte i `players.txt`.
+**Tillval 2 – Datorspelare med strategi (Daniel Norberg):** Direkt efter valet av antal spelare (totalt antal: mänskliga + datorer) väljer man hur många av dem som ska vara datorspelare. Det måste alltid bli minst en mänsklig spelare, så max antal datorer är de valda spelarna minus ett. Varje datorspelare får automatiskt ett namn ("Dator 1", "Dator 2", …) och en strategi – antingen den enkla (köpa under 17) eller grundstrategin (tabell). Dator- och mänskliga spelare sitter samtidigt vid bordet och Round vet inte skillnaden: beslutet levereras in som en funktion där `Program.cs` väljer mellan `ConsoleUi` och `IPlayerStrategy`. Mänskliga spelare spelar först i tur och ordning, sedan datorspelarna. Datorspelare sparas inte i `players.txt`.
 
 ## Regler som gäller
 
