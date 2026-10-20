@@ -29,6 +29,9 @@ while (true)
         foreach (Player p in round.Players)
             ui.ShowResult(p, round.Settle(p));
 
+        List<Player> eliminated = game.RemoveBrokePlayers();
+        ui.ShowEliminated(eliminated);
+
         new GameStorage().SavePlayers(game.SavedPlayers); // US10
     }
     else

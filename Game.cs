@@ -55,6 +55,19 @@ public class Game
         _seatedPlayers.Add(player);
     }
 
+    public List<Player> RemoveBrokePlayers()
+    {
+        List<Player> removed = _seatedPlayers
+            .Where(p => p.Wallet.IsBroke)
+            .ToList();
+
+        foreach (Player p in removed)
+            _seatedPlayers.Remove(p);
+
+        return removed;
+    }
+
+
     /// <summary>
     /// US13: skapar en datorspelare med given strategi och sätter ner
     /// den vid bordet. Spelaren läggs EJ i _savedPlayers – den sparas
