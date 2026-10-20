@@ -7,11 +7,9 @@ using System.Linq;
  ***US03: huvudmenyn (ShowMenu).
  */
 
-/// <summary>
 /// ConsoleUi: samlingspunkt för all in- och utmatning.
 /// Regelklasserna (Deck, Hand, Player, Dealer, Round) pratar
 /// ALDRIG med Console – allt går via denna klass.
-/// </summary>
 class ConsoleUi
 {
     public List<string> players = [];
@@ -42,10 +40,8 @@ class ConsoleUi
 
     // ---------- US11: validering ----------
 
-    /// <summary>
     /// Fråga om tills svaret är giltigt – ingen inmatning får någonsin
     /// krascha programmet eller tyst acceptera fel.
-    /// </summary>
     /// <param name="prompt">Frågan som visas för spelaren.</param>
     /// <param name="errorMessage">Visas om svaret inte är giltigt.</param>
     /// <param name="isValid">Returnerar true om svaret är giltigt.</param>
@@ -78,7 +74,7 @@ class ConsoleUi
         return betAmount;
     }
 
-    /// <summary>Läs in ett drag: köpa eller stanna.</summary>
+    /// Läs in ett drag: köpa eller stanna.
     public Move ReadMove(Player player)
     {
         ShowHand(player);
@@ -92,10 +88,10 @@ class ConsoleUi
 
     // ---------- US11: visa händar ----------
 
-    /// <summary>
+
     /// Visa en spelares hand: namn + totalt värde ovanför korten så
     /// att man alltid ser vems hand det är.
-    /// </summary>
+
     public void ShowHand(Player player)
     {
         Console.WriteLine();
@@ -103,11 +99,11 @@ class ConsoleUi
         ShowHand(player.Hand.Cards);
     }
 
-    /// <summary>
+
     /// Visa givarens hand med namnet ovanför korten så att man ser
     /// vems hand det är. Värdet visas först när hålkortet är vänt –
     /// annars skulle hålkortet "läcka" genom summan.
-    /// </summary>
+  
     public void ShowDealer(Dealer dealer, bool holeRevealed = false)
     {
         Console.WriteLine();
@@ -117,7 +113,7 @@ class ConsoleUi
         ShowHand(dealer.Hand.Cards, hideHoleCard: !holeRevealed);
     }
 
-    /// <summary>Visa rundans utfall för en spelare.</summary>
+    /// Visa rundans utfall för en spelare.
     public void ShowResult(Player player, Outcome outcome)
     {
         string text = outcome switch
@@ -133,10 +129,8 @@ class ConsoleUi
 
       // ---------- Tillval 3: husregler ----------
 
-    /// <summary>
     /// Visar husreglerna som gäller och eventuella meddelanden från
     /// inläsningen (saknad fil, felaktiga rader).
-    /// </summary>
     public void ShowRules(RuleSet rules)
     {
         foreach (string message in rules.Messages)
@@ -157,11 +151,11 @@ class ConsoleUi
   
     // ---------- US13: datorspelare ----------
 
-    /// <summary>Fråga hur många av de valda spelarna som ska vara
+    /// Fråga hur många av de valda spelarna som ska vara
     /// datorspelare. När det redan sitter en mänsklig spelare vid
     /// bordet får alla nya spelare vara datorer; annars (första
     /// tillägget) måste minst en vara människa, så max är antalet
-    /// valda spelare minus ett.</summary>
+    /// valda spelare minus ett.
     public int AskComputerCount(Game game)
     {
         bool humanSeated = game.SeatedPlayers.Any(p => !p.IsComputer);
@@ -172,7 +166,7 @@ class ConsoleUi
             s => int.TryParse(s, out int n) && n >= 0 && n <= maxComputers));
     }
 
-    /// <summary>Fråga vilken strategi datorspelaren ska ha.</summary>
+    /// Fråga vilken strategi datorspelaren ska ha.
     public IPlayerStrategy AskStrategy()
     {
         Console.WriteLine("Vilken strategi ska datorspelaren ha?");
@@ -187,14 +181,14 @@ class ConsoleUi
         return choice == "1" ? new SimpleStrategy() : new BasicStrategy();
     }
 
-    /// <summary>Visa vad en datorspelare gör så att man kan följa rundan.</summary>
+    /// Visa vad en datorspelare gör så att man kan följa rundan.
     public void ShowComputerMove(Player player, Move move)
     {
         Console.WriteLine($"{player.Name} (dator): {(move == Move.Hit ? "köper" : "stannar")}");
     }
 
-    /// <summary>Tillverkar ett unikt namn för en datorspelare:
-    /// "Dator 1", "Dator 2", …</summary>
+    /// Tillverkar ett unikt namn för en datorspelare:
+    /// "Dator 1", "Dator 2", …
     private static string UniqueComputerName(Game game, int i)
     {
         List<Player> taken = game.SavedPlayers.Concat(game.SeatedPlayers).ToList();
@@ -207,15 +201,15 @@ class ConsoleUi
 
     // ---------- US03: huvudmeny ----------
 
-    /// <summary>Antal spelare som sitter vid bordet (inkl. datorspelare, US13).</summary>
+    /// Antal spelare som sitter vid bordet (inkl. datorspelare, US13).
     private static int SeatedCount(Game game)
         => game.SeatedPlayers.Count;
 
-    /// <summary>
+
     /// Huvudmenyn: spela runda / spelare (visa, lägga till) / avsluta.
     /// Returnerar true om spelaren ska spela en runda, false om programmet
     /// ska avslutas.
-    /// </summary>
+    
     public bool ShowMenu(Game game)
     {
         while (true)
@@ -252,8 +246,8 @@ class ConsoleUi
         }
     }
 
-    /// <summary>Visar spelare vid bordet respektive tillgängliga spelare
-    /// och ger möjlighet att lägga till nya.</summary>
+    /// Visar spelare vid bordet respektive tillgängliga spelare
+    /// och ger möjlighet att lägga till nya.
     private void ShowPlayers(Game game)
     {
         List<Player> available = game.GetAvailablePlayers();
@@ -292,9 +286,9 @@ class ConsoleUi
             AddSeatedPlayers(game);
     }
 
-    /// <summary>Frågar antal (US01), direkt efter det hur många av
+    /// Frågar antal (US01), direkt efter det hur många av
     /// spelarna som är datorer (US13), och sedan namn (US01/US11) på
-    /// de mänskliga. Sätter alla ner vid bordet.</summary>
+    /// de mänskliga. Sätter alla ner vid bordet.
     private void AddSeatedPlayers(Game game)
     {
         // Max 5 spelare vid bordet totalt, inte bara per gång.

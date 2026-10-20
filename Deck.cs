@@ -16,11 +16,9 @@ public class Deck
     /// mitt i en runda.
     public int ReshuffleThreshold { get; }
 
-    /// <summary>
     /// Random delas av hela programmet (skapas en gång i Program.cs).
     /// Skapar man en ny Random vid varje blandning får man samma lek i
     /// on och om igen, eftersom den såddas från klockan.
-    /// </summary>
     public Deck(Random random, RuleSet rules)
     {
         _random = random;
@@ -51,10 +49,8 @@ public class Deck
         }
     }
 
-    /// <summary>
     /// Fisher-Yates: gå baklänges genom leken och byt plats på varje kort
     /// med ett slumpmässigt valt kort bland dem som ligger före.
-    /// </summary>
     public void Shuffle()
     {
         for (int i = _cards.Count - 1; i > 0; i--)
@@ -64,7 +60,7 @@ public class Deck
         }
     }
 
-    /// <summary>Tar bort och returnerar nästa kort i leken.</summary>
+    /// Tar bort och returnerar nästa kort i leken.
     public Card Deal()
     {
         if (IsEmpty)
@@ -79,10 +75,8 @@ public class Deck
         return card;
     }
 
-    /// <summary>
     /// Anropas inför varje ny runda: blandas om om färre än
     /// ReshuffleThreshold kort är kvar (värdet kommer från RuleSet).
-    /// </summary>
     public void ReshuffleIfLow()
     {
         if (RemainingCards < ReshuffleThreshold)

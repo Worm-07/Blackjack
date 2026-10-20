@@ -60,12 +60,11 @@ public class Game
         _seatedPlayers.Add(player);
     }
 
-    /// <summary>
     /// US13: skapar en datorspelare med given strategi och sätter ner
     /// den vid bordet. Spelaren läggs EJ i _savedPlayers – den sparas
     /// alltså inte till players.txt och kan inte krocka med ett
     /// mänskligt namn.
-    /// </summary>
+
     public Player CreateAndSeatComputer(string name, IPlayerStrategy strategy)
     {
         Player computer = new Player(name, strategy);
@@ -77,7 +76,6 @@ public class Game
     ***US09: Spela en runda***
     */
 
-    /// <summary>
     /// Spela en runda med alla spelare som sitter vid bordet.
     /// Mänskliga spelare spelar först i tur och ordning,
     /// sedan datorspelarna (US13).
@@ -86,7 +84,6 @@ public class Game
     /// funktion – Round pratar aldrig direkt med Console.
     /// Returnerar rundan så att loopen kan visa avgörandet för varje
     /// spelare (Settle är ren – samma svar före och efter Play()).
-    /// </summary>
     public Round PlayRound(Func<Player, Card, Move> askPlayer,
         Func<Player, int> readBet, Action<Dealer, bool>? showDealer = null, Action<Player>? showBusted = null)
     {
