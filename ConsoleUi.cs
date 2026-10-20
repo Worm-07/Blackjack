@@ -231,7 +231,7 @@ class ConsoleUi
         else
         {
             foreach (Player p in seated)
-                Console.WriteLine($"  {p.Name}{(p.IsComputer ? " (dator)" : "")}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
+                Console.WriteLine($"  {p.Name}{(p.IsComputer ? " (dator)" : "")}  (W {p.Wins} / L {p.Losses} / T {p.Pushes} / Saldo: {p.Wallet.Balance})");
         }
 
         Console.WriteLine();
@@ -243,7 +243,7 @@ class ConsoleUi
         else
         {
             foreach (Player p in available)
-                Console.WriteLine($"  {p.Name}  (W {p.Wins} / L {p.Losses} / T {p.Pushes})");
+                Console.WriteLine($"  {p.Name}  (W {p.Wins} / L {p.Losses} / T {p.Pushes} / Saldo: {p.Wallet.Balance})");
         }
 
         string add = ReadUntilValid(
