@@ -81,7 +81,9 @@ Enligt specen i uppgiftsbeskrivningen är standard reglerna följande:
 
 ## Kända brister
 
-- US15: försäkring (överkurs) saknas.
+- Grafisk bugg, problem vid många marker att spelet blir längre vertikalt desto fler marker man har. - Kan lösas med hjälp av högre valörer eller få markerna att ligga ovanpå varandra (komprimera ytan).
+- Grafisk bugg, om man scrollar i konsolen blir övre delen fast och repetativ.
+- Grafisk bugg, Blir problem med renderingen om man zoomar in eller ut under pågående körning av programmet.
 
 ## Klassdiagram
 
