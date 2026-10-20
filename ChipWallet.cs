@@ -43,7 +43,7 @@ public class ChipWallet
     }
 
     /// Naturlig tjugoett betalar 3:2 – insatsen tillbaka + 1,5 × insatsen.
-    /// Heltalsdivisionen avrundar nedåt. 
+    /// Heltalsdivisionen avrundar nedåt.
     public void CollectBlackjack()
     {
         Balance += CurrentBet + (CurrentBet * 3 / 2);

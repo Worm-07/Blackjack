@@ -1,6 +1,5 @@
 /*
  ***US09: Program.cs – entry point***
- ***Skelett – se TODO:erna.***
  */
 
 // En Random delas av HELA programmet. Skapas den på nytt i Deck
@@ -11,7 +10,12 @@ Random random = new();
 // US10: ladda tidigare spelare (namn + statistik) ur filen.
 List<Player> players = new GameStorage().LoadPlayers();
 
-Game game = new(players, random);
+// Tillval 3: Läs husreglerna från rules.txt. Saknas filen används
+// standardvärden. Reglerna (tillsammans med eventuella
+// inläsningsmeddelanden) visas under menyposten Regler.
+RuleSet rules = RuleSet.LoadFromFile();
+
+Game game = new(players, random, rules);
 ConsoleUi ui = new();
 
 // Spelloopen: meny (US03) → runda (US08) → spara (US10).
@@ -20,14 +24,27 @@ while (true)
     if (ui.ShowMenu(game))
     {
         // US08: en runda. US11: spelarens beslut (köpa/stanna) levereras
-        // till Round som Func<Player, Move> – Round pratar aldrig med Console.
-        // Givarens hand visas via ShowDealer (hålkortet dolt tills det vänts)
-        // och en spräckt spelare ser sin hand via ShowHand.
-        Round round = game.PlayRound((player, _) => ui.ReadMove(player), ui.ReadBet, ui.ShowDealer, ui.ShowHand);
+        // till Round som Func<Player, Card, Move> – Round pratar aldrig
+        // med Console. Givarens hand visas via ShowDealer (hålkortet dolt
+        // tills det vänts) och en spräckt spelare ser sin hand via ShowHand.
+        // US13: mänskliga spelare frågas av ConsoleUi, datorspelare avgörs
+        // av sin IPlayerStrategy – Round behöver inte veta skillnaden.
+        Round round = game.PlayRound(
+            (player, upCard) =>
+            {
+                if (player.Strategy is { } strategy)
+                {
+                    Move move = strategy.Decide(player.Hand, upCard);
+                    ui.ShowComputerMove(player, move);
+                    return move;
+                }
+                return ui.ReadMove(player);
+            },
+            ui.ReadBet, ui.ShowDealer, ui.ShowHand);
 
-        // US09: visa resultatet för varje spelare (Round visar själv aldrig).
-        foreach (Player p in round.Players)
-            ui.ShowResult(p, round.Settle(p));
+        // US09: visa resultatet: sista vyn med alla händar öppna och
+        // avgörandet för varje spelare (Round visar själv aldrig).
+        ui.ShowRoundEnd(round);
 
         // US15: spelare som är slut på marker lämnar bordet och
         // hamnar på topplistan (menyval 2). Game returnerar vilka, ConsoleUi visar.

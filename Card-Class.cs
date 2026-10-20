@@ -62,7 +62,7 @@ public class Card
             Rank.Queen => "Dam",
             Rank.King => "Kung",
             Rank.Ace => "Ess",
-            _ => ((int)Rank).ToString() // Om Rank inte matchar någon av de 4 valörer, använda Rank.ToString()
+            _ => ((int)Rank).ToString() // 2–10: sitt eget siffervärde
         };
     }
 //Metod för att konvertera Suit till strängar på svenska.
@@ -73,13 +73,11 @@ public class Card
             Suit.Hearts => "hjärter",
             Suit.Diamonds => "ruter",
             Suit.Clubs => "klöver",
-            Suit.Spades => "spader",
-            _ => Suit.ToString().ToLower() // Om Suit inte matchar någon av de 4 färgerna, använda Suit.ToString()
+            Suit.Spades => "spader"
         };
     }
 }
 
 // US05: Deck flyttad till Deck.cs – den har eget ansvar (blandning,
-// deal, korträkning) och egen Random. Denna fil innehåller bara
-// Suit, Rank och Card.
+// deal och korträkning). Denna fil innehåller bara Suit, Rank och Card.
 
