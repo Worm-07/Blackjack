@@ -73,6 +73,24 @@ public class Game
         return computer;
     }
 
+    /// <summary>
+    /// US15: tar bort spelare som har slut på marker från bordet och
+    /// returnerar dem, så att ConsoleUi kan visa ett meddelande (Game
+    /// skriver aldrig ut något själv). De sparade spelarna ligger kvar i
+    /// _savedPlayers med saldo 0 och hamnar på topplistan.
+    /// </summary>
+    public List<Player> RemoveBrokePlayers()
+    {
+        List<Player> removed = _seatedPlayers
+            .Where(p => p.Wallet.IsBroke)
+            .ToList();
+
+        foreach (Player p in removed)
+            _seatedPlayers.Remove(p);
+
+        return removed;
+    }
+
     /*
     ***US09: Spela en runda***
     */
@@ -106,9 +124,6 @@ public class Game
 
         Round round = new(_deck, _rules, players, askPlayer, readBet, showDealer, showBusted);
         round.Play();
-
-        // US15: spelare som fick slut på marker under rundan lämnar bordet.
-        RemoveBrokePlayers();
 
         return round;
     }
