@@ -30,7 +30,7 @@ public class Game
     // Spelare som finns sparade men inte sitter vid bordet
     public List<Player> GetAvailablePlayers()
     {
-        return _savedPlayers.Where(p => !_seatedPlayers.Contains(p)).ToList();
+        return _savedPlayers.Where(p => !_seatedPlayers.Contains(p) && !p.Wallet.IsBroke).ToList();
     }
 
     // Returnerar sparad spelare om namnet finns, annars en ny.
@@ -110,5 +110,10 @@ public class Game
         Round round = new(_deck, _seatedPlayers, askPlayer, readBet, showDealer, showBusted);
         round.Play();
         return round;
+    }
+
+    public List<Player> GetHighscoreList()
+    {
+        return _savedPlayers.Where(p => p.Wallet.IsBroke).OrderByDescending(p => p.Wins).ThenBy(p => p.Name).ToList();
     }
 }
