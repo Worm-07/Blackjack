@@ -331,6 +331,12 @@ class ConsoleUi
         }
     }
 
+    public void ShowEliminated(List<Player> eliminated)
+    {
+        foreach (Player p in eliminated)
+            Console.WriteLine($" === {p.Name} har inga fler marker och lämnar bordet ===");
+    }
+
     // Hjärter och ruter röda, klöver och spader svarta, baksidan mörkblå.
     private static ConsoleColor CardColor(Card card, bool isFaceDown)
     {
