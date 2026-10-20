@@ -138,6 +138,8 @@ public class Round
         PlayPlayers();
         PlayDealer();
 
+        // US15: utbetalning görs här (en gång per spelare) och inte i Settle,
+        // som är ren och anropas igen av Program.cs för att visa resultatet.
         foreach (var player in _players)
         {
             // US15: betala ut enligt avgörandet (vinst 1:1, naturlig 21 3:2,
@@ -149,14 +151,17 @@ public class Round
                     player.Wallet.CollectWin();
                     break;
                 case Outcome.Blackjack:
+                    player.Wallet.CollectBlackjack();
                     player.RecordWin();
                     player.Wallet.CollectBlackjack();
                     break;
                 case Outcome.Lose:
+                    player.Wallet.CollectLoss();
                     player.RecordLoss();
                     player.Wallet.CollectLoss();
                     break;
                 case Outcome.Push:
+                    player.Wallet.ReturnBet();
                     player.RecordPush();
                     player.Wallet.ReturnBet();
                     break;

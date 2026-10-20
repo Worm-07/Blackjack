@@ -32,10 +32,11 @@ public class Game
     // Spelare som sitter vid bordet (spelar i nästa runda)
     public IReadOnlyList<Player> SeatedPlayers => _seatedPlayers;
 
-    // Spelare som finns sparade men inte sitter vid bordet
+    // Spelare som finns sparade men inte sitter vid bordet.
+    // US15: spelare utan marker (IsBroke) ingår inte – de kan inte spela igen.
     public List<Player> GetAvailablePlayers()
     {
-        return _savedPlayers.Where(p => !_seatedPlayers.Contains(p)).ToList();
+        return _savedPlayers.Where(p => !_seatedPlayers.Contains(p) && !p.Wallet.IsBroke).ToList();
     }
 
     // Returnerar sparad spelare om namnet finns, annars en ny.
