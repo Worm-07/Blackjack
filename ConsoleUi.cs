@@ -858,7 +858,7 @@ class ConsoleUi
 
         string add = ReadUntilValid(
             "\n   Vill du lägga till spelare? (j/n) ",
-            " === J ELLER NEJ ===",
+            " === J ELLER N ===",
             s => s.Length == 1 && (s[0] is 'j' or 'J' or 'n' or 'N'));
 
         if (add.StartsWith("j", StringComparison.OrdinalIgnoreCase))
@@ -930,6 +930,7 @@ class ConsoleUi
     /// <summary>Frågar antalet nya spelare (1–maxPlayers), validerat.</summary>
     public void Print(int maxPlayers = 5)
     {
+        Console.WriteLine(); // tom rad mellan kommandona
         Console.WriteLine($"   1 - {maxPlayers} spelare");
         NumbersOfPlayers = int.Parse(
             ReadUntilValid(
@@ -943,6 +944,7 @@ class ConsoleUi
     {
         for (int i = 0; i < count; i++)
         {
+            Console.WriteLine(); // tom rad mellan kommandona
             players.Add(ReadUntilValid(
                 "Ange namn på spelaren: ",
                 " === ANGE ETT NAMN ===",
@@ -970,6 +972,7 @@ class ConsoleUi
         if (maxComputers <= 0)
             return 0;
 
+        Console.WriteLine(); // tom rad mellan kommandona
         return int.Parse(ReadUntilValid(
             $"   Hur många av dem ska vara datorspelare? (0–{maxComputers}) ",
             $" === ANGE ETT NUMMER MELLAN 0 OCH {maxComputers} ===",
@@ -979,6 +982,7 @@ class ConsoleUi
     /// <summary>Frågar vilken strategi datorspelaren ska ha.</summary>
     public IPlayerStrategy AskStrategy()
     {
+        Console.WriteLine(); // tom rad mellan kommandona
         Console.WriteLine("   Vilken strategi ska datorspelaren ha?");
         Console.WriteLine("     1. Enkel (köpa under 17)");
         Console.WriteLine("     2. Grundstrategi (tabell)");
