@@ -16,7 +16,7 @@ public class Game
     // gäller mellan rundor, inte bara inom en.
     private Deck? _deck;
 
-     public Game(List<Player> savedPlayers, Random random, RuleSet rules)
+    public Game(List<Player> savedPlayers, Random random, RuleSet rules)
     {
         _savedPlayers = savedPlayers;
         _random = random;

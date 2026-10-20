@@ -1,6 +1,5 @@
 /*
  ***Tillval 3 (US14): Husregler från konfigurationsfil***
- ***Skelett – metoden är markerad med TODO och ska implementeras.***
  */
 
 /// Regelinställningar som läses in från en textfil vid start och skickas

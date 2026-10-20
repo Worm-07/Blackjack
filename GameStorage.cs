@@ -6,7 +6,7 @@
 /// nästa gång programmet startas.
 ///
 /// Filformat, en spelare per rad:  Namn;Vinstar;Förluster;Lika;Saldo
-/// Exempel:                         Danie;12;5;3;100
+/// Exempel:                         Daniel;12;5;3;100
 public class GameStorage
 {
     /// Filen ligger i programkatalogen.

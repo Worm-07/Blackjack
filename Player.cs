@@ -40,7 +40,6 @@ public class Player : Participant
         Wallet = new ChipWallet(wallet);
     }
 
-
     /// <summary>Räkna en vunnen runda.</summary>
     public void RecordWin() => Wins++;
 

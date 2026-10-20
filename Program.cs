@@ -1,6 +1,5 @@
 /*
  ***US09: Program.cs – entry point***
- ***Skelett – se TODO:erna.***
  */
 
 // En Random delas av HELA programmet. Skapas den på nytt i Deck

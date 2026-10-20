@@ -7,16 +7,13 @@
 /// delar ut och håller koll på hur många kort som är kvar.
 public class Deck
 {
-    /// US06: färre än 15 kort kvar → ny blandad lek inför nästa runda.
-    /// Bytet sker aldrig mitt i en runda.
-    /// Tillval 3: antal lekar och ombladningströskel kommer från RuleSet.
-
     private readonly List<Card> _cards = new();
     private readonly Random _random;
     private readonly int _numberOfDecks;
 
-     /// Färre kort än så här kvar → ny blandad lek inför nästa runda.
-    /// Bytet sker aldrig mitt i en runda.
+    /// Färre kort än så här kvar → ny blandad lek inför nästa runda
+    /// (Tillval 3: tröskeln kommer från RuleSet). Bytet sker aldrig
+    /// mitt i en runda.
     public int ReshuffleThreshold { get; }
 
     /// <summary>
@@ -71,7 +68,6 @@ public class Deck
     public Card Deal()
     {
         if (IsEmpty)
-                if (IsEmpty)
         {
             // Leken tog slut mitt i en runda: ta fram en ny, blandad lek.
             BuildDeck();
