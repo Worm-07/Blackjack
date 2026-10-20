@@ -133,6 +133,7 @@ public class Round
             {
                 case Outcome.Win:
                     player.Wallet.CollectWin();
+                    player.RecordWin();
                     break;
                 case Outcome.Blackjack:
                     player.Wallet.CollectBlackjack();
