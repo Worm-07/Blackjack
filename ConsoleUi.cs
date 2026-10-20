@@ -207,7 +207,6 @@ class ConsoleUi
 
                 case "2":
                     ShowPlayers(game);
-                    game.GetHighscoreList();
                     break;
 
                 case "3":
@@ -220,8 +219,21 @@ class ConsoleUi
     /// och ger möjlighet att lägga till nya.</summary>
     private void ShowPlayers(Game game)
     {
+        List<Player> highscore = game.GetHighscoreList();
         List<Player> available = game.GetAvailablePlayers();
         List<Player> seated = game.SeatedPlayers.ToList();
+
+        Console.WriteLine();
+        Console.WriteLine("Topplista:");
+        if (highscore.Count == 0)
+        {
+            Console.WriteLine("  (inga)");
+        }
+        else
+        {
+            foreach (Player p in highscore)
+                Console.WriteLine($"  {p.Name}  (W {p.Wins})");
+        }
 
         Console.WriteLine();
         Console.WriteLine("Spelare vid bordet:");
