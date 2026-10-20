@@ -86,6 +86,7 @@ Enligt specen i uppgiftsbeskrivningen är standard reglerna följande:
 ## Klassdiagram
 
 ![Klassdiagram](docs/klassdiagram.png)
+![Klassdiagram](docs/klassdiagram1.png)
 
 Källfilen finns i `docs/klassdiagram.md` och uppdateras när koden ändras.
 
