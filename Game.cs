@@ -54,7 +54,6 @@ public class Game
     {
         _seatedPlayers.Add(player);
     }
-
     public List<Player> RemoveBrokePlayers()
     {
         List<Player> removed = _seatedPlayers
@@ -66,7 +65,6 @@ public class Game
 
         return removed;
     }
-
 
     /// <summary>
     /// US13: skapar en datorspelare med given strategi och sätter ner
