@@ -105,7 +105,10 @@ public class Game
 
         Round round = new(_deck, _rules, players, askPlayer, readBet, showDealer, showBusted);
         round.Play();
-       
+
+        // US15: spelare som fick slut på marker under rundan lämnar bordet.
+        RemoveBrokePlayers();
+
         return round;
     }
 }
