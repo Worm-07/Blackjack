@@ -36,7 +36,7 @@ public class BasicStrategy : IPlayerStrategy
 
     private static readonly string[] SoftTable =
     {
-        "HHHHHHHHHH", //  4 (kommer inte före – mjuka händer är minst 13)
+        "HHHHHHHHHH", //  4 (mjuk 4-11 förekommer inte, mjuk 12 = ess + ess)
         "HHHHHHHHHH", //  5
         "HHHHHHHHHH", //  6
         "HHHHHHHHHH", //  7
