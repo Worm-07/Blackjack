@@ -22,10 +22,10 @@ public class BasicStrategy : IPlayerStrategy
         "HHHHHHHHHH", //  9
         "HHHHHHHHHH", // 10
         "HHHHHHHHHH", // 11
-        "HHSSSSSSHH", // 12
-        "HHSSSSSSHH", // 13
-        "HHSSSSSSHH", // 14
-        "SSSSSSHHHH", // 15
+        "HHSSSHHHHH", // 12
+        "SSSSSHHHHH", // 13
+        "SSSSSHHHHH", // 14
+        "SSSSSHHHHH", // 15
         "SSSSSHHHHH", // 16
         "SSSSSSSSSS", // 17
         "SSSSSSSSSS", // 18
