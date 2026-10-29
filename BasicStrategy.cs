@@ -50,7 +50,7 @@ public class BasicStrategy : IPlayerStrategy
         "HHHHHHHHHH", // 15
         "HHHHHHHHHH", // 16
         "HHHHHHHHHH", // 17
-        "SSSSSSHHHH", // 18
+        "SSSSSSSHHH", // 18
         "SSSSSSSSSS", // 19
         "SSSSSSSSSS", // 20
         "SSSSSSSSSS", // 21
